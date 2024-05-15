@@ -46,6 +46,7 @@ def Create_Database(connection, database_name):
         except mysql.connector.Error as Error:
             print("Failed to Create Database:", Error)
             
+connection = ConnectToDatabase()
 
 # connection = mysql.connector.connect(
 #     host="localhost:3308",
@@ -55,7 +56,13 @@ def Create_Database(connection, database_name):
 #     database="Reserve"
 # )
 
-connection = ConnectToDatabase()
+
+
+mycursor = connection.cursor()
+
+mycursor.execute("CREATE TABLE customers (name VARCHAR(60), address VARCHAR(60))")
+mycursor.execute("CREATE TABLE customers (name VARCHAR(60), address VARCHAR(60))")
+
 
 
 
