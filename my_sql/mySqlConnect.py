@@ -1,4 +1,8 @@
 import mysql.connector
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 
 # def check_and_create_table(connection, table_name, create_table_sql):
 #     cursor = connection.cursor()
@@ -60,7 +64,7 @@ import mysql.connector
 #         else:
 #             print("Failed to establish a database connection")
 
-def ConnectToDatabase(host="localhost", port="3308", user="root", password="Admin@123", database="Reserve"):
+def ConnectToDatabase(host=os.getenv("host"), port=os.getenv("port"), user=os.getenv("user"), password=os.getenv("password"), database=os.getenv("database")):
     try:
         connection = mysql.connector.connect(
             host=host,
