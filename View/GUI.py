@@ -1,9 +1,10 @@
-import tkinter
+import tkinter as tk
 import tkinter.messagebox
 import customtkinter
 from PIL import Image
 from my_sql import mySqlConnect 
 from Controller import loginVerifierController as loginVerifier
+from tkcalendar import Calendar
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -65,6 +66,11 @@ class App(customtkinter.CTk):
                 stored_hashed_password, stored_salt = result
                 if loginVerifier.verify_password(password, stored_hashed_password, stored_salt):
                     tkinter.messagebox.showinfo("Login Successful", "User logged in successfully")
+                    # Clear the login form
+                    self.clear_login_form()
+                    # Open a new view   
+                    self.booking_page()
+                    
                 else:
                     tkinter.messagebox.showerror("Login Failed", "Incorrect password")
             else:
@@ -82,20 +88,9 @@ class App(customtkinter.CTk):
         # Insert the new user into the database
         if loginVerifier.create_user(new_username, hashed_password, salt):
             tkinter.messagebox.showinfo("Registration Successful", "User created successfully")
-            self.switch_to_login()
         else:
             tkinter.messagebox.showerror("Registration Failed", "Failed to create user")
 
-    def switch_to_login(self):
-        # Clear the registration form and revert back to the login form
-        self.register_username_label.destroy()
-        self.register_username_entry.destroy()
-        self.register_password_label.destroy()
-        self.register_password_entry.destroy()
-        self.register_button.destroy()
-
-        # Restore the login form
-        self.create_login_form()
 
     def create_login_form(self):
         # create login form
@@ -125,7 +120,65 @@ class App(customtkinter.CTk):
             self.password_label.destroy()
             self.password_entry.destroy()
             self.login_button.destroy()
+            self.register_button.destroy()
 
+    def booking_page(self):
+        # create booking form
+
+        self.departure_label = customtkinter.CTkLabel(self, text="Departure date:")
+        self.departure_label.place(x=3, y=25)
+
+        self.departure_entry = Calendar(self, selectmode="day", date_pattern="dd-mm-yyyy",borderwidth=0, bordercolor='white')
+        self.departure_entry.pack()
+
+        self.from_label = customtkinter.CTkLabel(self, text="From:")
+        self.from_label.pack()
+
+        self.from_entry = customtkinter.CTkOptionMenu(app, values=["option 1", "option 2"], command="")
+        self.from_entry.pack()
+
+        self.to_label = customtkinter.CTkLabel(self, text="To:")
+        self.to_label.pack()
+
+        self.to_entry = customtkinter.CTkOptionMenu(app, values=["option 1", "option 2"], command="")
+        self.to_entry.pack()
+
+        self.book_button = customtkinter.CTkButton(self, text="Book", command=self.book_tickets)
+        
+        #self.book_button.place(x=75, y=75)
+        self.book_button.grid(row=6, column=6, padx = 10, pady = 10)
+
+        #center the booking form
+        self.from_label.place(relx=0.5, rely=0.4, anchor="center")
+        self.from_entry.place(relx=0.5, rely=0.45, anchor="center")
+        self.to_label.place(relx=0.5, rely=0.5, anchor="center")
+        self.to_entry.place(relx=0.5, rely=0.55, anchor="center")
+        self.departure_label.place(relx=0.5, rely=0.6, anchor="center")
+        self.departure_entry.place(relx=0.5, rely=0.65, anchor="center")
+        self.book_button.place(relx=0.5, rely=0.7, anchor="center")
+
+    def book_tickets(self):
+        from_location = self.from_entry.get()
+        to_location = self.to_entry.get()
+        departure_date = self.departure_entry.get()
+
+        # Perform ticket booking logic
+
+        # Show success message
+        tkinter.messagebox.showinfo("Booking Successful", "Tickets booked successfully")
+
+        # Clear the booking form
+        self.clear_booking_form()
+
+    def clear_booking_form(self):
+        # Clear booking form elements
+        self.from_label.destroy()
+        self.from_entry.destroy()
+        self.to_label.destroy()
+        self.to_entry.destroy()
+        self.departure_label.destroy()
+        self.departure_entry.destroy()
+        self.book_button.destroy()
 if __name__ == "__main__":
     app = App()
     app.mainloop()

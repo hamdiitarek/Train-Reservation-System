@@ -36,11 +36,16 @@ def Construct_Database(connection):
             CREATE TABLE Coach (
                 Train_ID NUMERIC(10),
                 Coach_Number NUMERIC(4),
-                Number_Seats NUMERIC,
-                Max_Seats NUMERIC,
-                Class VARCHAR(15),
+                Seats_array NUMERIC(8),
+                Max_Seats NUMERIC(8),
                 PRIMARY KEY(Train_ID, Coach_Number),
-                UNIQUE (Class)
+                FOREIGN KEY(Train_ID) references Train(Train_ID)
+            );
+        """
+        create_Passenger_table_sql = """
+            CREATE TABLE Passenger (
+	            Name VARCHAR(30),
+                ID NUMERIC(10) PRIMARY KEY
             );
         """
         create_Ticket_table_sql = """
@@ -48,49 +53,50 @@ def Construct_Database(connection):
                 Ticket_ID NUMERIC(10),
                 Cost DECIMAL(6,3),
                 Train_ID NUMERIC(10),
-                Class VARCHAR(15),
                 Date DATE,
                 Departure_Time TIME,
                 Arrival_Time TIME,
-                From_Station VARCHAR(30),
-                To_Station VARCHAR(30),
+                From_Station VARCHAR(20),
+                To_Station VARCHAR(20),
                 Passenger_ID NUMERIC(10),
                 Coach_Number NUMERIC(4),
                 Seat_no NUMERIC(3),
                 PRIMARY KEY(Ticket_ID, Passenger_ID),
-                FOREIGN KEY(Class) REFERENCES Coach(Class) ON DELETE NO ACTION
+                FOREIGN KEY(Passenger_ID) REFERENCES Passenger(ID) ON DELETE NO ACTION,
+                FOREIGN KEY(To_Station) references Station(Name),
+                FOREIGN KEY(From_Station) references Station(Name)
             );
         """
         create_Train_table_sql = """
             CREATE TABLE Train (
 	            Name VARCHAR(20),
                 Train_ID NUMERIC(10),
-                FOREIGN KEY (Train_ID) REFERENCES Coach(Train_ID),
                 PRIMARY KEY (Train_ID)
             );
         """
         create_Station_table_sql = """
             CREATE TABLE Station (
-	            Name VARCHAR(30),
-                Area VARCHAR(50),
-                Governorate VARCHAR(40),
+	            Name VARCHAR(20),
+                Area VARCHAR(20),
+                Governorate VARCHAR(20),
                 PRIMARY KEY (Name)
             );
         """
+        create_Track_table_sql = """
+            CREATE TABLE Track (
+	            Name VARCHAR(30),
+                ID NUMERIC(10) PRIMARY KEY
+            );          
+        """
         create_index_sql1 = "ALTER TABLE Coach ADD INDEX idx_class (Class);"
-        create_index_sql2 = "ALTER TABLE Coach ADD INDEX idx_train_id (Train_ID);"
-
-        # cursor = connection.cursor()
-        # cursor.execute("drop Coach;")
-        # cursor.execute("drop Station;")
-        # cursor.execute("drop Ticket;")
 
         check_and_create_table(connection, 'Coach', create_Coach_table_sql)
-        create_index_if_not_exists(connection, 'Coach', 'idx_class', create_index_sql1)
+        #create_index_if_not_exists(connection, 'Coach', 'idx_class', create_index_sql1)
+        check_and_create_table(connection, 'Passenger', create_Passenger_table_sql)
         check_and_create_table(connection, 'Ticket', create_Ticket_table_sql)
-        #create_index_if_not_exists(connection, 'Coach', 'idx_train_id', create_index_sql2)
         check_and_create_table(connection, 'Train', create_Train_table_sql)
         check_and_create_table(connection, 'Station', create_Station_table_sql)
+        check_and_create_table(connection, 'Track', create_Track_table_sql)
     else:
         print("Failed to establish a database connection")
 
