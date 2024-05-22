@@ -5,9 +5,10 @@ from PIL import Image
 from my_sql import mySqlConnect 
 from Controller import loginVerifierController as loginVerifier
 from tkcalendar import Calendar
+import os
 
-customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
-customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+customtkinter.set_appearance_mode("System")
+customtkinter.set_default_color_theme("blue")
 
 class App(customtkinter.CTk):
     def __init__(self):
@@ -15,41 +16,54 @@ class App(customtkinter.CTk):
 
         # configure window
         self.title("Train Booking System")
-        self.geometry(f"{1100}x{580}")
+        self.geometry(f"{1100}x580")
 
-        my_image = customtkinter.CTkImage(light_image=Image.open("D:\\Users\\Hamdi\\Desktop\\EUI\\Semester 6\\CSE371 Database Systems\\Project\\Train Reservation System\\View\\Login.png"),
-                                  dark_image=Image.open("D:\\Users\\Hamdi\\Desktop\\EUI\\Semester 6\\CSE371 Database Systems\\Project\\Train Reservation System\\View\\Login.png"),
-                                  size=(1920, 1080))
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+        image_path = os.path.join(os.path.dirname(__file__), "Login.png")
+        my_image = customtkinter.CTkImage(light_image=Image.open(image_path),
+                                          dark_image=Image.open(image_path),
+                                          size=(1920, 1080))
 
         self.image_label = customtkinter.CTkLabel(self, image=my_image, text="")
-        self.image_label.pack()
+        self.image_label.grid(row=0, column=1, sticky="nsew")
 
+        self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=0)
+        self.sidebar_frame.grid(row=0, column=0, rowspan=2, sticky="nsew")
+        self.sidebar_frame.grid_rowconfigure(6, weight=1)
+
+        self.create_login_form()
+
+    def create_login_form(self):
         # create login form
-        self.username_label = customtkinter.CTkLabel(self, text="Username:")
-        self.username_label.pack()
+        self.clear_sidebar()
 
-        self.username_entry = customtkinter.CTkEntry(self)
-        self.username_entry.pack()
+        self.username_label = customtkinter.CTkLabel(self.sidebar_frame, text="Username:")
+        self.username_label.grid(row=0, column=0, padx=20, pady=(20, 10), sticky="w")
 
-        self.password_label = customtkinter.CTkLabel(self, text="Password:")
-        self.password_label.pack()
+        self.username_entry = customtkinter.CTkEntry(self.sidebar_frame)
+        self.username_entry.grid(row=1, column=0, padx=20, pady=(10, 10), sticky="ew")
 
-        self.password_entry = customtkinter.CTkEntry(self, show="*")
-        self.password_entry.pack()
+        self.password_label = customtkinter.CTkLabel(self.sidebar_frame, text="Password:")
+        self.password_label.grid(row=2, column=0, padx=20, pady=(10, 10), sticky="w")
 
-        self.login_button = customtkinter.CTkButton(self, text="Login", command=self.login)
-        self.login_button.pack()
+        self.password_entry = customtkinter.CTkEntry(self.sidebar_frame, show="*")
+        self.password_entry.grid(row=3, column=0, padx=20, pady=(10, 10), sticky="ew")
 
-        self.register_button = customtkinter.CTkButton(self, text="Register", command=self.register)
-        self.register_button.pack()
+        self.login_button = customtkinter.CTkButton(self.sidebar_frame, text="Login", command=self.login)
+        self.login_button.grid(row=4, column=0, padx=20, pady=(10, 10), sticky="ew")
 
-        # center the login form
-        self.username_label.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-        self.username_entry.place(relx=0.5, rely=0.45, anchor=tkinter.CENTER)
-        self.password_label.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-        self.password_entry.place(relx=0.5, rely=0.55, anchor=tkinter.CENTER)
-        self.login_button.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
-        self.register_button.place(relx=0.5, rely=0.65, anchor=tkinter.CENTER)
+        self.register_button = customtkinter.CTkButton(self.sidebar_frame, text="Register", command=self.register)
+        self.register_button.grid(row=5, column=0, padx=20, pady=(10, 10), sticky="ew")
+
+    def clear_sidebar(self):
+        for widget in self.sidebar_frame.winfo_children():
+            widget.destroy()
+
+    def clear_main_content(self):
+        for widget in self.grid_slaves(row=0, column=1):
+            widget.destroy()
 
     def login(self):
         username = self.username_entry.get()
@@ -66,17 +80,34 @@ class App(customtkinter.CTk):
                 stored_hashed_password, stored_salt = result
                 if loginVerifier.verify_password(password, stored_hashed_password, stored_salt):
                     tkinter.messagebox.showinfo("Login Successful", "User logged in successfully")
-                    # Clear the login form
-                    self.clear_login_form()
-                    # Open a new view   
+                    # Update the sidebar with profile info
+                    self.update_sidebar_after_login(username)
+                    # Open the booking page
                     self.booking_page()
-                    
                 else:
                     tkinter.messagebox.showerror("Login Failed", "Incorrect password")
             else:
                 tkinter.messagebox.showerror("Login Failed", "User not found")
         else:
             tkinter.messagebox.showerror("Database Error", "Failed to connect to the database")
+
+    def update_sidebar_after_login(self, username):
+        self.clear_sidebar()
+
+        self.profile_label = customtkinter.CTkLabel(self.sidebar_frame, text=f"Welcome, {username}")
+        self.profile_label.grid(row=0, column=0, padx=20, pady=(20, 10), sticky="w")
+
+        self.logout_button = customtkinter.CTkButton(self.sidebar_frame, text="Logout", command=self.logout)
+        self.logout_button.grid(row=1, column=0, padx=20, pady=(10, 10), sticky="ew")
+
+        self.other_features_button = customtkinter.CTkButton(self.sidebar_frame, text="Other Features", command=self.other_features)
+        self.other_features_button.grid(row=2, column=0, padx=20, pady=(10, 10), sticky="ew")
+
+    def logout(self):
+        # Clear profile info and show login form
+        self.create_login_form()
+        # Clear the booking page or other main content
+        self.clear_main_content()
 
     def register(self):
         new_username = self.username_entry.get()
@@ -91,94 +122,88 @@ class App(customtkinter.CTk):
         else:
             tkinter.messagebox.showerror("Registration Failed", "Failed to create user")
 
-
-    def create_login_form(self):
-        # create login form
-        self.username_label = customtkinter.CTkLabel(self, text="Username:")
-        self.username_label.pack()
-
-        self.username_entry = customtkinter.CTkEntry(self)
-        self.username_entry.pack()
-
-        self.password_label = customtkinter.CTkLabel(self, text="Password:")
-        self.password_label.pack()
-
-        self.password_entry = customtkinter.CTkEntry(self, show="*")
-        self.password_entry.pack()
-
-        self.login_button = customtkinter.CTkButton(self, text="Login", command=self.login)
-        self.login_button.pack()
-
-        # center the login form
-        self.username_label.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-        self.username_entry.place(relx=0.5, rely=0.45, anchor=tkinter.CENTER)
-
-    def clear_login_form(self):
-            # Clear login form elements
-            self.username_label.destroy()
-            self.username_entry.destroy()
-            self.password_label.destroy()
-            self.password_entry.destroy()
-            self.login_button.destroy()
-            self.register_button.destroy()
-
     def booking_page(self):
-        # create booking form
+        self.clear_main_content()
 
-        self.departure_label = customtkinter.CTkLabel(self, text="Departure date:")
-        self.departure_label.place(x=3, y=25)
+        self.booking_frame = customtkinter.CTkFrame(self)
+        self.booking_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
 
-        self.departure_entry = Calendar(self, selectmode="day", date_pattern="dd-mm-yyyy",borderwidth=0, bordercolor='white')
-        self.departure_entry.pack()
+        self.departure_label = customtkinter.CTkLabel(self.booking_frame, text="Departure date:")
+        self.departure_label.grid(row=0, column=0, padx=10, pady=(10, 5), sticky="w")
 
-        self.from_label = customtkinter.CTkLabel(self, text="From:")
-        self.from_label.pack()
+        self.departure_entry = Calendar(self.booking_frame, selectmode="day", date_pattern="dd-mm-yyyy")
+        self.departure_entry.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="w")
 
-        self.from_entry = customtkinter.CTkOptionMenu(app, values=["option 1", "option 2"], command="")
-        self.from_entry.pack()
+        self.from_label = customtkinter.CTkLabel(self.booking_frame, text="From:")
+        self.from_label.grid(row=0, column=1, padx=10, pady=(10, 5), sticky="w")
 
-        self.to_label = customtkinter.CTkLabel(self, text="To:")
-        self.to_label.pack()
+        self.from_entry = customtkinter.CTkOptionMenu(self.booking_frame, values=["option 1", "option 2"])
+        self.from_entry.grid(row=1, column=1, padx=10, pady=(5, 10), sticky="w")
 
-        self.to_entry = customtkinter.CTkOptionMenu(app, values=["option 1", "option 2"], command="")
-        self.to_entry.pack()
+        self.to_label = customtkinter.CTkLabel(self.booking_frame, text="To:")
+        self.to_label.grid(row=0, column=2, padx=10, pady=(10, 5), sticky="w")
 
-        self.book_button = customtkinter.CTkButton(self, text="Book", command=self.book_tickets)
-        
-        #self.book_button.place(x=75, y=75)
-        self.book_button.grid(row=6, column=6, padx = 10, pady = 10)
+        self.to_entry = customtkinter.CTkOptionMenu(self.booking_frame, values=["option 1", "option 2"])
+        self.to_entry.grid(row=1, column=2, padx=10, pady=(5, 10), sticky="w")
 
-        #center the booking form
-        self.from_label.place(relx=0.5, rely=0.4, anchor="center")
-        self.from_entry.place(relx=0.5, rely=0.45, anchor="center")
-        self.to_label.place(relx=0.5, rely=0.5, anchor="center")
-        self.to_entry.place(relx=0.5, rely=0.55, anchor="center")
-        self.departure_label.place(relx=0.5, rely=0.6, anchor="center")
-        self.departure_entry.place(relx=0.5, rely=0.65, anchor="center")
-        self.book_button.place(relx=0.5, rely=0.7, anchor="center")
+        self.book_button = customtkinter.CTkButton(self.booking_frame, text="Book", command=self.book_tickets)
+        self.book_button.grid(row=2, column=0, columnspan=3, padx=10, pady=(10, 10), sticky="ew")
 
-    def book_tickets(self):
+        self.available_trains_label = customtkinter.CTkLabel(self.booking_frame, text="Available Trains:")
+        self.available_trains_label.grid(row=3, column=0, columnspan=3, padx=10, pady=(10, 5), sticky="w")
+
+        self.available_trains_listbox = tk.Listbox(self.booking_frame)
+        self.available_trains_listbox.grid(row=4, column=0, columnspan=3, padx=10, pady=(5, 10), sticky="nsew")
+
+        self.booking_frame.grid_columnconfigure(0, weight=1)
+        self.booking_frame.grid_columnconfigure(1, weight=1)
+        self.booking_frame.grid_columnconfigure(2, weight=1)
+        self.booking_frame.grid_rowconfigure(4, weight=1)
+
+        # Bind the calendar selection to update the train list
+        self.departure_entry.bind("<<CalendarSelected>>", self.update_available_trains)
+
+    def update_available_trains(self, event):
+        selected_date = self.departure_entry.get_date()
         from_location = self.from_entry.get()
         to_location = self.to_entry.get()
-        departure_date = self.departure_entry.get()
 
-        # Perform ticket booking logic
+        # Query the database to get available trains for the selected date and locations
+        trains = self.get_available_trains(selected_date, from_location, to_location)
+
+        # Update the Listbox with the available trains
+        self.available_trains_listbox.delete(0, tk.END)
+        for train in trains:
+            self.available_trains_listbox.insert(tk.END, train)
+
+    def get_available_trains(self, date, from_location, to_location):
+        # This function should query the database for available trains
+        # For now, it returns a placeholder list of trains
+        return [f"Train {i} from {from_location} to {to_location} on {date}" for i in range(1, 6)]
+
+    def book_tickets(self):
+        selected_trains = self.available_trains_listbox.curselection()
+        if not selected_trains:
+            tkinter.messagebox.showwarning("No Selection", "Please select a train to book.")
+            return
+
+        # Perform ticket booking logic for the selected trains
+        selected_trains_list = [self.available_trains_listbox.get(i) for i in selected_trains]
 
         # Show success message
-        tkinter.messagebox.showinfo("Booking Successful", "Tickets booked successfully")
+        tkinter.messagebox.showinfo("Booking Successful", f"Tickets booked for: {', '.join(selected_trains_list)}")
 
         # Clear the booking form
         self.clear_booking_form()
 
     def clear_booking_form(self):
-        # Clear booking form elements
-        self.from_label.destroy()
-        self.from_entry.destroy()
-        self.to_label.destroy()
-        self.to_entry.destroy()
-        self.departure_label.destroy()
-        self.departure_entry.destroy()
-        self.book_button.destroy()
+        self.from_entry.set("")
+        self.to_entry.set("")
+        self.available_trains_listbox.delete(0, tk.END)
+
+    def other_features(self):
+        tkinter.messagebox.showinfo("Feature", "This is a placeholder for features.")
+
 if __name__ == "__main__":
     app = App()
     app.mainloop()

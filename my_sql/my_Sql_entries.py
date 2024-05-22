@@ -32,6 +32,15 @@ def create_index_if_not_exists(connection, table_name, index_name, create_index_
 
 def Construct_Database(connection):
     if connection:
+        create_users_table_sql = """
+            CREATE TABLE users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(50) NOT NULL UNIQUE,
+                password_hash VARCHAR(255) NOT NULL,
+                salt VARCHAR(255) NOT NULL
+            );
+        """
+
         create_Coach_table_sql = """
             CREATE TABLE Coach (
                 Train_ID NUMERIC(10),
@@ -97,6 +106,7 @@ def Construct_Database(connection):
         check_and_create_table(connection, 'Train', create_Train_table_sql)
         check_and_create_table(connection, 'Station', create_Station_table_sql)
         check_and_create_table(connection, 'Track', create_Track_table_sql)
+        check_and_create_table(connection, 'users', create_users_table_sql)
     else:
         print("Failed to establish a database connection")
 
