@@ -116,7 +116,6 @@ class App(customtkinter.CTk):
         # Clear profile info and show login form
         self.create_login_form()
         #display the image in my_image
-        self.image_labe
         
         # Clear the booking page or other main content
         self.clear_main_content()
