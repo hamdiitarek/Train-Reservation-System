@@ -34,6 +34,15 @@ class App(customtkinter.CTk):
         self.sidebar_frame.grid_rowconfigure(6, weight=1)
 
         self.create_login_form()
+        self.update_appearance_mode()
+    def update_appearance_mode(self):
+        self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
+        self.appearance_mode_label.grid(row=8, column=0, padx=20, pady=(10, 0))
+        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
+                                                                       command=self.change_appearance_mode_event)
+        self.appearance_mode_optionemenu.grid(row=9, column=0, padx=20, pady=(10, 10))
+
+        
 
     def create_login_form(self):
         # create login form
@@ -106,6 +115,9 @@ class App(customtkinter.CTk):
     def logout(self):
         # Clear profile info and show login form
         self.create_login_form()
+        #display the image in my_image
+        self.image_labe
+        
         # Clear the booking page or other main content
         self.clear_main_content()
 
@@ -203,6 +215,10 @@ class App(customtkinter.CTk):
 
     def other_features(self):
         tkinter.messagebox.showinfo("Feature", "This is a placeholder for features.")
+
+    def change_appearance_mode_event(self, new_appearance_mode: str):
+        customtkinter.set_appearance_mode(new_appearance_mode)
+
 
 if __name__ == "__main__":
     app = App()
