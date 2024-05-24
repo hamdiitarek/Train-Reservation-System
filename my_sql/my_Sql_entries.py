@@ -110,7 +110,7 @@ def Construct_Database(connection):
     else:
         print("Failed to establish a database connection")
 
-def ConnectToDatabase(host="localhost", port="3308", user="root", password="Admin@123", database="Reserve"):
+def ConnectToDatabase(host="localhost", port="3308", user="root", password="##DO7asick##", database="Reserve"):
     try:
         connection = mysql.connector.connect(
             host=host,
