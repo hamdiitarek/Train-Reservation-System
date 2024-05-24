@@ -10,7 +10,11 @@ from GUI_ui import clear_main_content, clear_sidebar, create_login_form_ui
 def login(app):
     username = app.username_entry.get()
     password = app.password_entry.get()
-
+    
+    if (len(username) == 0 or len(password) == 0):
+        tkinter.messagebox.showinfo("incorrect info", "Username or password cannot be empty")
+        return
+        
     connection = CreateConnection.create()
     if connection:
         backEnd = connection.cursor()
@@ -51,6 +55,10 @@ def logout(app):
 def register(app):
     new_username = app.username_entry.get()
     new_password = app.password_entry.get()
+    
+    if (len(new_username) == 0 or len(new_password) == 0):
+        tkinter.messagebox.showinfo("incorrect info", "Username or password cannot be empty")
+        return
 
     hashed_password, salt = LoginVerifier.hash_password(new_password)
 

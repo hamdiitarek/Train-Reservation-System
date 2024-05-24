@@ -84,5 +84,3 @@ def Construct_Database():
     
     backEnd.close()
     connection.close()
-    
-Construct_Database()
