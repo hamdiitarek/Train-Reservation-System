@@ -28,8 +28,7 @@ def Construct_Database():
     create_Station_table_sql = """
     (
         Name VARCHAR(20),
-        Area VARCHAR(20),
-        Governorate VARCHAR(20),
+        City VARCHAR(20),
         PRIMARY KEY (Name)
     );
     """

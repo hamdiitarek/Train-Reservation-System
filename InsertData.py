@@ -33,7 +33,7 @@ def create_stations(stations):
     connection = CreateConnection.create()
     cursor = connection.cursor()
     
-    sql = "INSERT INTO Station (Name, Area, Governorate) VALUES (%s, %s, %s)"
+    sql = "INSERT INTO Station (Name, City) VALUES (%s, %s)"
     
     cursor.executemany(sql, stations)
     connection.commit()
@@ -53,18 +53,29 @@ def create_tickets(Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Stati
     connection.close()
     return True
 
-stations = [ # I wont insert data cause safwat will change them lol
-    ("Scranton Business Park")
-    ("Dunder Mifflin Inc.")
-    ("Schrute Farms")
-    ("Electric City Sign")
-    ("Nashua, New Hampshire")
-    ("Stamford, Connecticut")
-    ("Utica, New York")
-    ("Coopers")
-    ("Vance Refrigeration")
-    ("Alfredo's Pizza Cafe")
-    ("Hooters")
+def create_track(From_Station, To_Station):
+    sql = "INSERT INTO Track (From_Station, To_Station) VALUES (%s, %s)"
+    val = (From_Station, To_Station )
+
+    backEnd.execute(sql, val)
+    connection.commit()
+
+    backEnd.close()
+    connection.close()
+    return True
+
+stations = [ # I wont insert data cause safwat will change them lol # Doha changed them, kareem is good
+    ("Scranton Business Park","Pensylvania")
+    ("Dunder Mifflin Inc.","New York")
+    ("Schrute Farms","California")
+    ("Electric City Sign","Washington")
+    ("New Hampshire","Nashua")
+    ("Connecticut","Stamford")
+    ("Utica","Utah")
+    ("Coopers","Texas")
+    ("Vance Refrigeration","Alabama")
+    ("Alfredo's Pizza Cafe","Minnesota")
+    ("Hooters","Los Angeles")
 ]
 create_stations(stations)
 
