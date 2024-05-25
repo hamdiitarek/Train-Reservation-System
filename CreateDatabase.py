@@ -49,7 +49,6 @@ def Construct_Database():
     (
         Ticket_ID NUMERIC(10),
         Train_ID NUMERIC(10),
-        Date DATE,
         Departure_Time TIME,
         Arrival_Time TIME,
         From_Station VARCHAR(20),
@@ -67,8 +66,11 @@ def Construct_Database():
     
     create_Track_table_sql = """
     (
-        Name VARCHAR(30),
-        ID NUMERIC(10) PRIMARY KEY
+        From_Station VARCHAR(20),
+        To_Station VARCHAR(20),
+        FOREIGN KEY(To_Station) references Station(Name),
+        FOREIGN KEY(From_Station) references Station(Name)
+        PRIMARY KEY(To_Station, From_Station)
     );          
     """
 

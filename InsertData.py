@@ -42,18 +42,29 @@ def create_stations(stations):
     connection.close()
     return True  # Indicate successful batch insertion
 
+def create_tickets(Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username):
+    sql = "INSERT INTO Ticket (Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username) VALUES (%s, %s, %s, %s,%s, %s, %s, %s,%s)"
+    val = (Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
+
+    backEnd.execute(sql, val)
+    connection.commit()
+
+    backEnd.close()
+    connection.close()
+    return True
+
 stations = [ # I wont insert data cause safwat will change them lol
-    ()
-    ()
-    ()
-    ()
-    ()
-    ()
-    ()
-    ()
-    ()
-    ()
-    ()
+    ("Scranton Business Park")
+    ("Dunder Mifflin Inc.")
+    ("Schrute Farms")
+    ("Electric City Sign")
+    ("Nashua, New Hampshire")
+    ("Stamford, Connecticut")
+    ("Utica, New York")
+    ("Coopers")
+    ("Vance Refrigeration")
+    ("Alfredo's Pizza Cafe")
+    ("Hooters")
 ]
 create_stations(stations)
 
