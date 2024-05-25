@@ -59,6 +59,23 @@ def register(app):
     if (len(new_username) == 0 or len(new_password) == 0):
         tkinter.messagebox.showinfo("incorrect info", "Username or password cannot be empty")
         return
+    
+
+    connection = CreateConnection.create()
+    backEnd = connection.cursor()
+    sql = "SELECT password_hash, salt FROM users WHERE username = %s"
+    val = (new_username,)
+    backEnd.execute(sql, val)
+    result = backEnd.fetchone()
+    if result:
+        stored_hashed_password, stored_salt = result
+        if LoginVerifier.verify_password(new_password, stored_hashed_password, stored_salt):
+            tkinter.messagebox.showinfo("Login Successful", "User logged in successfully")
+            app.update_sidebar_after_login(new_username)
+            app.booking_page()
+        else:
+            tkinter.messagebox.showerror("Login Failed", "User Already Exists.")
+        return
 
     hashed_password, salt = LoginVerifier.hash_password(new_password)
 
