@@ -24,7 +24,7 @@ def create_login_form_ui(app):
 def update_appearance_mode(app):
     app.appearance_mode_label = customtkinter.CTkLabel(app.sidebar_frame, text="Appearance Mode:", anchor="w")
     app.appearance_mode_label.grid(row=8, column=0, padx=20, pady=(10, 0))
-    app.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(app.sidebar_frame, values=["Light", "Dark", "System"],
+    app.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(app.sidebar_frame, values=["System", "Light", "Dark"],
                                                                     command=app.change_appearance_mode_event)
     app.appearance_mode_optionemenu.grid(row=9, column=0, padx=20, pady=(10, 10))
 
