@@ -1,3 +1,5 @@
+import sys
+sys.dont_write_bytecode = True
 import tkinter.messagebox
 import tkinter as tk
 import customtkinter

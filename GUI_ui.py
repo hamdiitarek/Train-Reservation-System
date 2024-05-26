@@ -1,3 +1,5 @@
+import sys
+sys.dont_write_bytecode = True
 import customtkinter
 
 def create_login_form_ui(app):

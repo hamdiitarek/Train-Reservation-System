@@ -6,8 +6,8 @@
 
 # el file dah el tneen by3ml kol 7aga (graph, booking, update stations list, test booking)
 
-
 import sys
+sys.dont_write_bytecode = True
 import mysql.connector
 from collections import deque
 from CreateConnection import connect
