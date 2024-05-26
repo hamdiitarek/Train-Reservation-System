@@ -27,10 +27,11 @@ class App(customtkinter.CTk):
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        image_path = os.path.join(os.path.dirname(__file__), "Login.png")
-        my_image = customtkinter.CTkImage(light_image=Image.open(image_path),
-                                          dark_image=Image.open(image_path),
-                                          size=(1920, 1080))
+        light_image_path = os.path.join(os.path.dirname(__file__), "1.png")
+        dark_image_path = os.path.join(os.path.dirname(__file__), "2.png")
+        my_image = customtkinter.CTkImage(light_image=Image.open(light_image_path),
+                                          dark_image=Image.open(dark_image_path),
+                                          size=(930, 580))
 
         self.image_label = customtkinter.CTkLabel(self, image=my_image, text="")
         self.image_label.grid(row=0, column=1, sticky="nsew")
