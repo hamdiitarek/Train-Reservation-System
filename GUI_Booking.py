@@ -14,13 +14,37 @@ def booking_page(app):
     app.from_label = customtkinter.CTkLabel(app.booking_frame, text="From:")
     app.from_label.grid(row=0, column=0, padx=10, pady=(10, 5), sticky="w")
 
-    app.from_entry = customtkinter.CTkOptionMenu(app.booking_frame, values=["option 1", "option 2"])
+    app.from_entry = customtkinter.CTkOptionMenu(app.booking_frame, values=[
+        "Scranton Business Park",
+        "Dunder Mifflin Inc.",
+        "Schrute Farms",
+        "Electric City Sign",
+        "New Hampshire",
+        "Connecticut",
+        "Utica",
+        "Coopers",
+        "Vance Refrigeration",
+        "Alfredo's Pizza Cafe",
+        "Hooters"
+        ])
     app.from_entry.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="w")
 
     app.to_label = customtkinter.CTkLabel(app.booking_frame, text="To:")
     app.to_label.grid(row=0, column=1, padx=10, pady=(10, 5), sticky="w")
 
-    app.to_entry = customtkinter.CTkOptionMenu(app.booking_frame, values=["option 1", "option 2"])
+    app.to_entry = customtkinter.CTkOptionMenu(app.booking_frame, values=[
+        "Scranton Business Park",
+        "Dunder Mifflin Inc.",
+        "Schrute Farms",
+        "Electric City Sign",
+        "New Hampshire",
+        "Connecticut",
+        "Utica",
+        "Coopers",
+        "Vance Refrigeration",
+        "Alfredo's Pizza Cafe",
+        "Hooters"
+        ])
     app.to_entry.grid(row=1, column=1, padx=10, pady=(5, 10), sticky="w")
 
     app.book_button = customtkinter.CTkButton(app.booking_frame, text="Book", command=app.book_tickets)
@@ -38,18 +62,17 @@ def booking_page(app):
     app.booking_frame.grid_rowconfigure(4, weight=1)
 
 def update_available_trains(app, event):
-    selected_date = app.departure_entry.get_date()
     from_location = app.from_entry.get()
     to_location = app.to_entry.get()
 
-    trains = get_available_trains(selected_date, from_location, to_location)
+    trains = get_available_trains(from_location, to_location)
 
     app.available_trains_listbox.delete(0, tk.END)
     for train in trains:
         app.available_trains_listbox.insert(tk.END, train)
 
-def get_available_trains(date, from_location, to_location):
-    return [f"Train {i} from {from_location} to {to_location} on {date}" for i in range(1, 6)]
+def get_available_trains(from_location, to_location):
+    return [f"Train {i} from {from_location} to {to_location}" for i in range(1, 6)]
 
 def book_tickets(app):
     selected_trains = app.available_trains_listbox.curselection()
