@@ -6,6 +6,8 @@ connection = CreateConnection.create()
 backEnd = connection.cursor()
 
 def create_train(Name, Train_ID):
+    connection = CreateConnection.create()
+    backEnd = connection.cursor()
     sql = "INSERT INTO Train (Name, Train_ID) VALUES (%s, %s)"
     val = (Name, Train_ID)
     backEnd.execute(sql, val)
@@ -15,6 +17,8 @@ def create_train(Name, Train_ID):
     return True
 
 def create_Coach(Train_ID, Coach_Number, Seats_array, Max_Seats):
+    connection = CreateConnection.create()
+    backEnd = connection.cursor()
     sql = "INSERT INTO Train (Train_ID, Coach_Number, Seats_array, Max_Seats) VALUES (%s, %s, %s, %s)"
     val = (Train_ID, Coach_Number, Seats_array, Max_Seats)
     backEnd.execute(sql, val)
@@ -35,6 +39,8 @@ def create_stations(stations):
     return True  # Indicate successful batch insertion
 
 def create_tickets(Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username):
+    connection = CreateConnection.create()
+    backEnd = connection.cursor()
     sql = "INSERT INTO Ticket (Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username) VALUES (%s, %s, %s, %s,%s, %s, %s, %s,%s)"
     val = (Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
 

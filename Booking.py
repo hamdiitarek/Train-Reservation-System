@@ -13,7 +13,6 @@ from collections import deque
 from CreateConnection import connect
 from datetime import datetime, timedelta
 
-sys.dont_write_bytecode = True
 
 def get_all_stations():
     connection = connect()
