@@ -8,6 +8,7 @@
 
 import sys
 sys.dont_write_bytecode = True
+
 import mysql.connector
 from collections import deque
 from CreateConnection import connect
@@ -31,60 +32,96 @@ def get_routes():
     cursor.close()
     connection.close()
     return routes
-
+    
 
 def find_route(routes, start, end):
+    
     graph = {}
     for from_station, to_station, train_id in routes:
         if from_station not in graph:
             graph[from_station] = []
-        if to_station not in graph:
-            graph[to_station] = []
         graph[from_station].append((to_station, train_id))
-        graph[to_station].append((from_station, train_id)) #bidirectional routes
 
-    queue = deque([[(start, None)]])
-    visited = set()
-
-    while queue:
-        path = queue.popleft()
-        station, current_train_id = path[-1]
-
-        if station in visited:
-            continue
-
-        for next_station, next_train_id in graph.get(station, []):
-            new_path = list(path)
-            new_path.append((next_station, next_train_id))
-            queue.append(new_path)
-            if next_station == end:
-                return new_path
-
-        visited.add(station)
+    queue = deque()
+    queue.append(start)
     
+    visited = set()
+    visited.add(start)
+    
+    parentAndTrain = dict()
+    parentAndTrain[start] = (start, None)
+    
+    while queue:
+        station = queue.popleft()
+
+        if station == end:
+            break
+
+        for next_station, next_train_id in graph[station]:
+            if next_station not in visited:
+                queue.append(next_station)
+                visited.add(next_station)
+                parentAndTrain[next_station] = [station, next_train_id]
+
+    route = []
+    station = end
+    
+    while (station in parentAndTrain) and station != parentAndTrain[station][0]:
+        route.append([station, parentAndTrain[station][1]])
+        station = parentAndTrain[station][0]
+    
+    if len(route) != 0:
+        route.append([station, None])
+        route.reverse()
+        return route
     return None
 
 
-def book_ticket(ticket_id, departure_time, from_station, to_station, coach_number, seat_no, username):
+def book_ticket(departure_time, from_station, to_station, coach_number, seat_no, username):
+    
     connection = connect()
     cursor = connection.cursor()
+    
+    # Get the next available ticket ID from the database
+    cursor.execute("SELECT MAX(Together_ID) FROM Ticket")
+    booked_together_id = cursor.fetchone()[0]
+    booked_together_id = booked_together_id + 1 if booked_together_id else 1
+    
     try:
         routes = get_routes()
         route = find_route(routes, from_station, to_station)
+        
         if not route:
             raise ValueError("No route found between {} and {}".format(from_station, to_station))
         
+        print(route)
+        
         last_departure_time = datetime.strptime(departure_time, "%H:%M")
         print(f"Starting at {from_station} at {last_departure_time.strftime('%H:%M')}")
-
+        first_train_id = route[1][1]
+        
         for i in range(len(route) - 1):
-            station, current_track_id = route[i]
-            next_station, next_track_id = route[i + 1]
+            [station, current_train_id] = route[i]
+            [next_station, next_train_id] = route[i + 1]
 
-            if i > 0 and current_track_id != next_track_id:
+            if i > 0 and current_train_id != next_train_id:
             # Assume 10 minutes to switch trains
+                temp = last_departure_time;
                 last_departure_time += timedelta(minutes=10)
-                print(f"Switch trains at {station}. Next train (ID: {next_track_id}) departs at {last_departure_time.strftime('%H:%M')}")
+                print(f"Switch trains at {station}. Next train (ID: {next_train_id}) departs at {last_departure_time.strftime('%H:%M')}")
+                
+                sql = """
+                INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                
+                arrival_time = last_departure_time.strftime("%H:%M")
+                val = (first_train_id, booked_together_id, departure_time, temp, from_station, station, coach_number, seat_no, username)
+                cursor.execute(sql, val)
+                connection.commit()
+                departure_time = arrival_time
+                first_train_id = next_train_id
+                from_station = station
 
             # Assume 1 hour travel time between stations (adjust as needed)
             travel_time = timedelta(hours=1)
@@ -94,13 +131,13 @@ def book_ticket(ticket_id, departure_time, from_station, to_station, coach_numbe
         arrival_time = last_departure_time.strftime("%H:%M")
         
         # Use the train ID from the first segment of the journey
-        first_train_id = route[1][1]
+
         
         sql = """
-        INSERT INTO Ticket (Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
+        INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        val = (ticket_id, first_train_id, departure_time, arrival_time, from_station, to_station, coach_number, seat_no, username)
+        val = (first_train_id, booked_together_id, departure_time, arrival_time, from_station, to_station, coach_number, seat_no, username)
         cursor.execute(sql, val)
         connection.commit()
         
@@ -132,20 +169,14 @@ def update_from_station_list(to_station):
 
 #booking test
 try:
-    from_station = "Vance Refrigeration"
+    from_station = "Schrute Farms"
     to_station = "Connecticut"
     departure_time = "08:00"
-
-    # Get the next available ticket ID from the database
-    connection = connect()
-    cursor = connection.cursor()
-    cursor.execute("SELECT MAX(Ticket_ID) FROM Ticket")
-    last_ticket_id = cursor.fetchone()[0]
-    ticket_id = last_ticket_id + 1 if last_ticket_id else 1
-
-    book_ticket(ticket_id, departure_time, from_station, to_station, 1, 1, "omar")
+    book_ticket(departure_time, from_station, to_station, 1, 1, "omar")
+    
+    from_station = "Schrute Farms"
+    to_station = "Connecticut"
+    departure_time = "08:00"
+    book_ticket(departure_time, from_station, to_station, 1, 3, "omar")
 except ValueError as e:
     print(e)
-
-
-

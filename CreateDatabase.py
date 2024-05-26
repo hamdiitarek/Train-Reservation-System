@@ -46,7 +46,8 @@ def Construct_Database():
     
     create_Ticket_table_sql = """
     (
-        Ticket_ID NUMERIC(10),
+        Ticket_ID int auto_increment,
+        Together_ID int,
         Train_ID NUMERIC(10),
         Departure_Time TIME,
         Arrival_Time TIME,
@@ -69,8 +70,8 @@ def Construct_Database():
         To_Station VARCHAR(60),
         Train_ID NUMERIC(10),
         FOREIGN KEY(To_Station) references Station(Name),
-        FOREIGN KEY(From_Station) references Station(Name)
-        -- PRIMARY KEY(To_Station, From_Station)
+        FOREIGN KEY(From_Station) references Station(Name),
+        PRIMARY KEY(To_Station, From_Station)
     );          
     """
 

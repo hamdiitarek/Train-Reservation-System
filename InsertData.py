@@ -32,7 +32,7 @@ def create_stations(stations):
     connection = CreateConnection.create()
     cursor = connection.cursor()
     sql = "INSERT INTO Station (Name, City) VALUES (%s, %s)"
-    cursor.executemany(sql, stations)
+    cursor.executemany(sql, stations)    
     connection.commit()
     cursor.close()
     connection.close()
@@ -67,7 +67,7 @@ def create_track(from_station, to_station, train_id):
     return True
 
 stations = [ # I wont insert data cause safwat will change them lol # Doha changed them, kareem is good
-    ("Scranton Business Park","Pensylvania"),
+    # ("Scranton Business Park","Pensylvania"),
     ("Dunder Mifflin Inc.","New York"),
     ("Schrute Farms","California"),
     ("Electric City Sign","Washington"),
@@ -75,41 +75,27 @@ stations = [ # I wont insert data cause safwat will change them lol # Doha chang
     ("Connecticut","Stamford"),
     ("Utica","Utah"),
     ("Coopers","Texas"),
-    ("Vance Refrigeration","Alabama"),
+    # ("Vance Refrigeration","Alabama"),
     ("Alfredo's Pizza Cafe","Minnesota"),
     ("Hooters","Los Angeles")
 ]
-create_stations(stations)
-
-create_train("Thomas", 21)
-create_train("Percy", 32)
-create_train("James", 10)
-create_train("Edward", 17)
-create_train("Gordon", 19)
-create_train("Flynn", 49)
-create_train("Henry", 33)
-create_train("Diesel", 35)
-create_train("Emily", 12)
-create_train("Sheldon", 16)
 
 train_assignments = {
-    "main_track": 1,  # Train 1 for the main track
-    "california_connect": 2,  # Train 2 for the California connection
-    "washington_connect": 3,  # Train 3 for the Washington connection
-    "nashua_connect": 4  # Train 4 for the Nashua connection
+    "main_track": [21, 10],  # Train 1 for the main track
+    "california_connect": [32, 17],  # Train 2 for the California connection
+    "washington_connect": [19, 49],  # Train 3 for the Washington connection
+    "nashua_connect": [33, 35]  # Train 4 for the Nashua connection
 }
-
 
 tracks_with_trains = {
     "main_track": [
-        ("Vance Refrigeration", "Schrute Farms"),
+        # ("Vance Refrigeration", "Schrute Farms"),
         ("Schrute Farms", "Electric City Sign"),
-        ("Electric City Sign", "New Hampshire"),
-        ("New Hampshire", "Scranton Business Park")
+        ("Electric City Sign", "New Hampshire")
     ],
     "california_connect": [
         ("Schrute Farms", "Hooters"),
-        ("Hooters", "Alfredo's Pizza Cafe")
+        ("Schrute Farms", "Alfredo's Pizza Cafe")
     ],
     "washington_connect": [
         ("Electric City Sign", "Utica"),
@@ -121,9 +107,25 @@ tracks_with_trains = {
     ]
 }
 
-for key, train_id in train_assignments.items():
-    for from_station, to_station in tracks_with_trains[key]:
-        try:
-            create_track(from_station, to_station, train_id)
-        except ValueError as e:
-            print(e)
+def byHand():
+    
+    create_stations(stations)
+
+    create_train("Thomas", 21) # main track
+    create_train("James", 10) # main track
+    create_train("Percy", 32) # california
+    create_train("Edward", 17) # california
+    create_train("Gordon", 19) # washington
+    create_train("Flynn", 49) # washington
+    create_train("Henry", 33) # nashua
+    create_train("Diesel", 35) # nashua
+    create_train("Emily", 12)
+    create_train("Sheldon", 16)
+    
+    for key, train_id in train_assignments.items():
+        for from_station, to_station in tracks_with_trains[key]:
+            try:
+                create_track(from_station, to_station, train_id[0])
+                create_track(to_station, from_station, train_id[1])
+            except ValueError as e:
+                print(e)
