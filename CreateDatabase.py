@@ -27,7 +27,7 @@ def Construct_Database():
     
     create_Station_table_sql = """
     (
-        Name VARCHAR(20),
+        Name VARCHAR(60),
         City VARCHAR(20),
         PRIMARY KEY (Name)
     );
@@ -50,13 +50,13 @@ def Construct_Database():
         Train_ID NUMERIC(10),
         Departure_Time TIME,
         Arrival_Time TIME,
-        From_Station VARCHAR(20),
-        To_Station VARCHAR(20),
+        From_Station VARCHAR(60),
+        To_Station VARCHAR(60),
         Coach_Number NUMERIC(1),
         Seat_no NUMERIC(3),
         username VARCHAR(50),
         PRIMARY KEY(Ticket_ID),
-        FOREIGN KEY(Train_ID, Coach_Number) references Coach(Train_ID, Coach_Number),
+     --   FOREIGN KEY(Train_ID, Coach_Number) references Coach(Train_ID, Coach_Number),
 		FOREIGN KEY(username) REFERENCES users(username) ON DELETE NO ACTION,
         FOREIGN KEY(To_Station) references Station(Name),
         FOREIGN KEY(From_Station) references Station(Name)
@@ -65,11 +65,12 @@ def Construct_Database():
     
     create_Track_table_sql = """
     (
-        From_Station VARCHAR(20),
-        To_Station VARCHAR(20),
+        From_Station VARCHAR(60),
+        To_Station VARCHAR(60),
+        Train_ID NUMERIC(10),
         FOREIGN KEY(To_Station) references Station(Name),
         FOREIGN KEY(From_Station) references Station(Name)
-        PRIMARY KEY(To_Station, From_Station)
+        -- PRIMARY KEY(To_Station, From_Station)
     );          
     """
 
