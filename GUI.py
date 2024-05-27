@@ -17,9 +17,14 @@ customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("blue")
 
 class App(customtkinter.CTk):
+    
+    UserName = ""
+    
     def __init__(self):
         super().__init__()
 
+        self.UserName = ""
+        
         # configure window
         self.title("Train Booking System")
         self.geometry(f"{1100}x580")
@@ -42,7 +47,12 @@ class App(customtkinter.CTk):
 
         create_login_form_ui(self)
         update_appearance_mode(self)
+    
+    def setUsername(self, value):
+        self.UserName = value
         
+    def getUsername(self):
+        return self.UserName
 
     def clear_sidebar(self):
         clear_sidebar(self)

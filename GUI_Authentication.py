@@ -26,6 +26,7 @@ def login(app):
             stored_hashed_password, stored_salt = result
             if LoginVerifier.verify_password(password, stored_hashed_password, stored_salt):
                 tkinter.messagebox.showinfo("Login Successful", "User logged in successfully")
+                app.setUsername(username)
                 app.update_sidebar_after_login(username)
                 app.booking_page()
             else:

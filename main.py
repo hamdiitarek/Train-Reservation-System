@@ -6,6 +6,6 @@ import CreateDatabase
 import InsertData
 
 CreateDatabase.Construct_Database()
-# InsertData.byHand()
+InsertData.byHand()
 app = GUI.App()
 app.mainloop()

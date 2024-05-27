@@ -57,7 +57,7 @@ def Construct_Database():
         Seat_no NUMERIC(3),
         username VARCHAR(50),
         PRIMARY KEY(Ticket_ID),
-     --   FOREIGN KEY(Train_ID, Coach_Number) references Coach(Train_ID, Coach_Number),
+        FOREIGN KEY(Train_ID, Coach_Number) references Coach(Train_ID, Coach_Number),
 		FOREIGN KEY(username) REFERENCES users(username) ON DELETE NO ACTION,
         FOREIGN KEY(To_Station) references Station(Name),
         FOREIGN KEY(From_Station) references Station(Name)
@@ -71,7 +71,21 @@ def Construct_Database():
         Train_ID NUMERIC(10),
         FOREIGN KEY(To_Station) references Station(Name),
         FOREIGN KEY(From_Station) references Station(Name),
+        FOREIGN KEY(Train_ID) references Train(Train_ID),
         PRIMARY KEY(To_Station, From_Station)
+    );          
+    """
+    
+    create_Time_Track_table_sql = """
+    (
+        From_Station VARCHAR(60),
+        To_Station VARCHAR(60),
+        Train_ID NUMERIC(10),
+        dept_time NUMERIC(2),
+        FOREIGN KEY(To_Station) references Station(Name),
+        FOREIGN KEY(From_Station) references Station(Name),
+        FOREIGN KEY(Train_ID) references Train(Train_ID),
+        PRIMARY KEY(To_Station, From_Station, dept_time)
     );          
     """
 
@@ -84,6 +98,7 @@ def Construct_Database():
     check_and_create_table(backEnd, 'Coach', create_Coach_table_sql)
     check_and_create_table(backEnd, 'Ticket', create_Ticket_table_sql)
     check_and_create_table(backEnd, 'Track', create_Track_table_sql)
+    check_and_create_table(backEnd, 'Time_Track', create_Time_Track_table_sql)
     
     backEnd.close()
     connection.close()
