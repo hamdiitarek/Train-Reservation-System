@@ -123,9 +123,18 @@ def book_ticket(departure_time, from_station, to_station, username):
                 
                 if (seat >= 100):
                     print("train is full")
+                    return
                     
                 coach = (seat // 25) + 1
                 seat = (seat % 25) + 1
+
+                sql = """
+                    update coach
+                    set Seats_array = {}
+                    where Coach_Number = {} and Train_ID = {};
+                """.format(seat, coach, first_train_id)
+
+                cursor.execute(sql)
                 
                 sql = """
                 INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
@@ -162,9 +171,18 @@ def book_ticket(departure_time, from_station, to_station, username):
         
         if (seat >= 100):
             print("train is full")
+            return
             
         coach = (seat // 25) + 1
         seat = (seat % 25) + 1
+
+        sql = """
+            update coach
+            set Seats_array = {}
+            where Coach_Number = {} and Train_ID = {};
+        """.format(seat, coach, first_train_id)
+
+        cursor.execute(sql)
         
         sql = """
         INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)

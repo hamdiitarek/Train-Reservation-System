@@ -47,6 +47,10 @@ def booking_page(app):
     app.booking_frame.grid_columnconfigure(2, weight=1)
     app.booking_frame.grid_rowconfigure(4, weight=1)
 
+def printTickets(app):
+    # username = app.
+    return 0
+
 def modify_ticket(app):
     Username = GUI.App.UserName 
     tickets = Booking.fetch_tickets(Username)
