@@ -5,6 +5,7 @@ import tkinter.messagebox
 import tkinter as tk
 import customtkinter
 import Booking
+import GUI
 
 # Assuming getCompleteRoute and its dependencies are defined elsewhere and imported here
 # from your_module import getCompleteRoute
@@ -45,6 +46,24 @@ def booking_page(app):
     app.booking_frame.grid_columnconfigure(1, weight=1)
     app.booking_frame.grid_columnconfigure(2, weight=1)
     app.booking_frame.grid_rowconfigure(4, weight=1)
+
+def modify_ticket(app):
+    Username = GUI.App.UserName 
+    tickets = Booking.fetch_tickets(Username)
+
+    app.available_trains_listbox = tk.Listbox(app.booking_frame)
+    app.available_trains_listbox.grid(row=4, column=0, columnspan=3, padx=10, pady=(5, 10), sticky="nsew")
+    app.available_trains_listbox.delete(0, tk.END)
+    for ticket in tickets:
+        ticket_str = f"Ticket ID: {ticket[0]} Train ID: {ticket[1]} Departure Time: {ticket[2]} Arrival Time: {ticket[3]} From Station: {ticket[4]} To Station: {ticket[5]} Coach Number: {ticket[6]} Seat Number: {ticket[7]}"
+        app.available_trains_listbox.insert(tk.END, ticket_str)
+    app.booking_frame.grid_columnconfigure(0, weight=1)
+    app.booking_frame.grid_columnconfigure(1, weight=1)
+    app.booking_frame.grid_columnconfigure(2, weight=1)
+    app.booking_frame.grid_rowconfigure(4, weight=1)
+
+    
+
 
 def update_to_stations(app):
     from_station = app.from_entry.get()

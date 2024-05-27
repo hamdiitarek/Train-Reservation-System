@@ -6,6 +6,7 @@ import customtkinter
 import CreateConnection
 import LoginVerifier
 from GUI_ui import clear_main_content, clear_sidebar, create_login_form_ui
+import GUI_Booking
 
 def login(app):
     username = app.username_entry.get()
@@ -44,9 +45,6 @@ def update_sidebar_after_login(app, username):
 
     app.logout_button = customtkinter.CTkButton(app.sidebar_frame, text="Logout", command=app.logout)
     app.logout_button.grid(row=1, column=0, padx=20, pady=(10, 10), sticky="ew")
-
-    app.other_features_button = customtkinter.CTkButton(app.sidebar_frame, text="Other Features", command=app.other_features)
-    app.other_features_button.grid(row=2, column=0, padx=20, pady=(10, 10), sticky="ew")
 
 def logout(app):
     create_login_form_ui(app)

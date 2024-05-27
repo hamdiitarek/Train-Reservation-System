@@ -1,6 +1,7 @@
 import sys
 sys.dont_write_bytecode = True
 import customtkinter
+import GUI_Booking
 
 def create_login_form_ui(app):
     app.clear_sidebar()
@@ -22,6 +23,8 @@ def create_login_form_ui(app):
 
     app.register_button = customtkinter.CTkButton(app.sidebar_frame, text="Register", command=app.register)
     app.register_button.grid(row=5, column=0, padx=20, pady=(10, 10), sticky="ew")
+
+
 
 def update_appearance_mode(app):
     app.appearance_mode_label = customtkinter.CTkLabel(app.sidebar_frame, text="Appearance Mode:", anchor="w")
