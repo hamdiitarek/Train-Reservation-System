@@ -270,18 +270,25 @@ def fetch_tickets(username):
         # Database connection to fetch tickets
         conn = create()
         cursor = conn.cursor()
-        cursor.execute("SELECT Ticket_ID , Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, FROM Ticket WHERE username = %s group by Together_ID", (username,))
+
+        sql = """
+            SELECT Ticket_ID, Together_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no
+            FROM Ticket 
+            WHERE username = \"{}\"
+            order by Together_ID;
+        """.format(username)
+
+        cursor.execute(sql)
         tickets = cursor.fetchall()
         conn.close()
         return tickets
 
-def delete_ticket(together_id):
+def delete_ticket(together_id, username):
     connecion = create()
     cursor = connecion.cursor()
-    cursor.execute("DELETE FROM Ticket WHERE Together_ID = %s", (together_id,))
+    cursor.execute("DELETE FROM Ticket WHERE Together_ID = {} and username = \"{}\"".format(together_id, username))
     connecion.commit()
     connecion.close()
-    
 #print(getCompleteRoute("New Hampshire", "Connecticut"))
 
 #booking test
