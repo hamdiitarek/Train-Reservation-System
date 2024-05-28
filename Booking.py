@@ -220,5 +220,5 @@ def delete_ticket(together_id, username):
     connecion.close()
 
 # print()
-print(fetch_tickets("omar"))
+#print(fetch_tickets("omar"))
 #print(getCompleteRoute("New Hampshire", "Connecticut"))
