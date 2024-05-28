@@ -328,13 +328,13 @@ def byHand():
 
     insert_coaches_in_trains()
     
-    for key, train_id in train_assignments.items():
-        for from_station, to_station in tracks_with_trains[key]:
-            try:
-                create_track(from_station, to_station, train_id[0])
-                create_track(to_station, from_station, train_id[1])
-            except ValueError as e:
-                print(e)
+    # for key, train_id in train_assignments.items():
+    #     for from_station, to_station in tracks_with_trains[key]:
+    #         try:
+    #             create_track(from_station, to_station, train_id[0])
+    #             create_track(to_station, from_station, train_id[1])
+    #         except ValueError as e:
+    #             print(e)
 
     for key, train_id in train_assignments.items():
 
@@ -347,7 +347,6 @@ def byHand():
 
         l = tracks_with_trains[key].copy()
         l.reverse()
-        # print(l)
         counter = 0
 
         for to_station, from_station in l:

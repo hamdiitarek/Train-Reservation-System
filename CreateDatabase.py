@@ -64,18 +64,6 @@ def Construct_Database():
     );
     """
     
-    create_Track_table_sql = """
-    (
-        From_Station VARCHAR(60),
-        To_Station VARCHAR(60),
-        Train_ID NUMERIC(10),
-        FOREIGN KEY(To_Station) references Station(Name),
-        FOREIGN KEY(From_Station) references Station(Name),
-        FOREIGN KEY(Train_ID) references Train(Train_ID),
-        PRIMARY KEY(To_Station, From_Station)
-    );          
-    """
-    
     create_Time_Track_table_sql = """
     (
         From_Station VARCHAR(60),
@@ -97,7 +85,6 @@ def Construct_Database():
     check_and_create_table(backEnd, 'Station', create_Station_table_sql)
     check_and_create_table(backEnd, 'Coach', create_Coach_table_sql)
     check_and_create_table(backEnd, 'Ticket', create_Ticket_table_sql)
-    check_and_create_table(backEnd, 'Track', create_Track_table_sql)
     check_and_create_table(backEnd, 'Time_Track', create_Time_Track_table_sql)
     
     backEnd.close()

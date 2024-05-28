@@ -71,7 +71,7 @@ def modify_ticket(app):
 
 def update_to_stations(app):
     from_station = app.from_entry.get()
-    to_stations = Booking.update_to_station_list(from_station)
+    to_stations = Booking.find_to_station_list(from_station)
     app.to_entry.configure(values=to_stations)
     app.to_entry.set("")
     

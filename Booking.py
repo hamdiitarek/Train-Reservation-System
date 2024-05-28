@@ -15,58 +15,6 @@ def get_all_stations():
     connection.close()
     return stations
 
-def get_routes():
-    connection = create()
-    cursor = connection.cursor()
-    cursor.execute("SELECT From_Station, To_Station, Train_ID FROM Track")
-    routes = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return routes
-    
-
-def find_route(routes, start, end):
-    
-    graph = {}
-    for from_station, to_station, train_id in routes:
-        if from_station not in graph:
-            graph[from_station] = []
-        graph[from_station].append((to_station, train_id))
-
-    queue = deque()
-    queue.append(start)
-    
-    visited = set()
-    visited.add(start)
-    
-    parentAndTrain = dict()
-    parentAndTrain[start] = (start, None)
-    
-    while queue:
-        station = queue.popleft()
-
-        if station == end:
-            break
-
-        for next_station, next_train_id in graph[station]:
-            if next_station not in visited:
-                queue.append(next_station)
-                visited.add(next_station)
-                parentAndTrain[next_station] = [station, next_train_id]
-
-    route = []
-    station = end
-    
-    while (station in parentAndTrain) and station != parentAndTrain[station][0]:
-        route.append([station, parentAndTrain[station][1]])
-        station = parentAndTrain[station][0]
-    
-    if len(route) != 0:
-        route.append([station, None])
-        route.reverse()
-        return route
-    return None
-
 def getSeats(Train_ID):
     
     connection = create()
@@ -102,6 +50,86 @@ def getSeats(Train_ID):
     connection.close()
     return seat, coach
 
+def neighbours(fStation):
+    connection = create()
+    cursor = connection.cursor()
+    cursor.execute("SELECT To_Station, Train_ID, dept_time FROM Time_Track where From_Station = \"{}\"".format(fStation))
+    routes = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return routes
+
+visited = set()
+
+def dfs_findTimeRoute(fStation, tStation, target, Train_id, Dept_time):
+    
+    if tStation in visited:
+        return []
+    visited.add(tStation)
+    
+    if tStation == target:
+        return [[fStation, tStation, Train_id, Dept_time]]
+    
+    arr = neighbours(tStation)
+    for to_station, train_id, dept_time in arr:
+        if dept_time - Dept_time == 2:
+            ret = dfs_findTimeRoute(tStation, to_station, target, train_id, dept_time).copy()
+            if len(ret) != 0:
+                ret.append([fStation, tStation, Train_id, Dept_time])
+                return ret      
+    
+    return []
+
+def getCompleteRoute(fStation, tStation):
+    l = []
+    
+    arr = neighbours(fStation)
+    for to_station, train_id, dept_time in arr:
+        visited.clear()
+        ret = dfs_findTimeRoute(fStation, to_station, tStation, train_id, dept_time).copy()
+        if len(ret) != 0:
+            ret.reverse()
+            l.append(ret)
+            
+    visited.clear()
+    return l
+
+def dfs_find_reachable(fStation, Dept_time, total_time, target):
+    
+    if (fStation) in visited:
+        return
+    visited.add(fStation)
+    
+    if total_time == 24:
+        return
+    
+    arr = neighbours(fStation)
+    for to_station, train_id, dept_time in arr:
+        if to_station != target and dept_time - Dept_time == 2:
+            dfs_find_reachable(to_station, dept_time, total_time + 2, target)
+
+def find_to_station_list(fStation):
+    
+    l = []
+    
+    arr = neighbours(fStation)
+    for to_station, train_id, dept_time in arr:
+        visited.clear()
+        dfs_find_reachable(to_station, dept_time, 2, fStation)
+        l.append(visited.copy())
+    
+    to_stations = set()
+    
+    for i in l:
+        for j in i:
+            to_stations.add(j)
+            
+    to_stations = list(to_stations)
+    to_stations.sort()
+    
+    visited.clear()
+    return to_stations
+        
 def book_ticket(route, username):
     
     connection = create()
@@ -140,72 +168,8 @@ def book_ticket(route, username):
         cursor.execute(sql)
         connection.commit()
 
-    # cursor.close()
-    # connection.close()
-
-def update_to_station_list(from_station):
-    
-    routes = get_routes()
-    stations = set()
-    allStations = get_all_stations()
-    
-    for to_st in allStations:
-        if to_st != from_station:
-            route = find_route(routes, from_station, to_st)
-            if route:
-                stations.add(to_st)
-    return list(stations)
-
-def update_from_station_list(to_station):
-    routes = get_routes()
-    stations = set()
-    for from_st, to_st in routes:
-        if from_st == to_station or to_st == to_station:
-            stations.add(to_st if from_st == to_station else from_st)
-    return list(stations)
-
-def get_time_routes(fStation):
-    connection = create()
-    cursor = connection.cursor()
-    cursor.execute("SELECT To_Station, Train_ID, dept_time FROM Time_Track where From_Station = \"{}\"".format(fStation))
-    routes = cursor.fetchall()
     cursor.close()
     connection.close()
-    return routes
-
-visited = set()
-
-def findTimeRoute(fStation, tStation, target, Train_id, Dept_time):
-    
-    if tStation in visited:
-        return []
-    visited.add(tStation)
-    
-    if tStation == target:
-        return [[fStation, tStation, Train_id, Dept_time]]
-    
-    arr = get_time_routes(tStation)
-    
-    for to_station, train_id, dept_time in arr:
-        if dept_time - Dept_time == 2:
-            ret = findTimeRoute(tStation, to_station, target, train_id, dept_time).copy()
-            if len(ret) != 0:
-                ret.append([fStation, tStation, Train_id, Dept_time])
-                return ret      
-    
-    return []
-
-def getCompleteRoute(fStation, tStation):
-    l = []
-    arr = get_time_routes(fStation)
-    for to_station, train_id, dept_time in arr:
-        visited.clear()
-        ret = findTimeRoute(fStation, to_station, tStation, train_id, dept_time).copy()
-        if len(ret) != 0:
-            ret.reverse()
-            l.append(ret)
-    return l
-        
 
 def fetch_tickets(username):
         # Database connection to fetch tickets
@@ -220,6 +184,7 @@ def fetch_tickets(username):
 
         cursor.execute(sql)
         tickets = cursor.fetchall()
+        cursor.close()
         conn.close()
         return tickets
 
@@ -228,21 +193,8 @@ def delete_ticket(together_id, username):
     cursor = connecion.cursor()
     cursor.execute("DELETE FROM Ticket WHERE Together_ID = {} and username = \"{}\"".format(together_id, username))
     connecion.commit()
+    cursor.close()
     connecion.close()
+
 #print(getCompleteRoute("New Hampshire", "Connecticut"))
-
-print(fetch_tickets("omar"))
-
-#booking test
-# try:
-    # from_station = "Schrute Farms"
-#     to_station = "Connecticut"
-#     departure_time = "08:00"
-#     book_ticket(departure_time, from_station, to_station, 1, 1, "omar")
-    
-#     from_station = "Schrute Farms"
-#     to_station = "Connecticut"
-#     departure_time = "08:00"
-#     book_ticket(departure_time, from_station, to_station, 1, 3, "omar")
-# except ValueError as e:
-#     print(e)
+# print(fetch_tickets("omar"))
