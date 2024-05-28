@@ -294,7 +294,7 @@ tracks_with_trains = {
 
 
 def byHand():
-    print(len(stations))
+    #print(len(stations))
     create_stations(stations)
 
     create_train("Thomas", 21)  # main track
