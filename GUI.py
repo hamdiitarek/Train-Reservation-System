@@ -8,10 +8,10 @@ from PIL import Image
 import CreateConnection
 import LoginVerifier
 import os
-
-from GUI_ui import create_login_form_ui, update_appearance_mode, clear_main_content, clear_sidebar
+from GUI_ui import create_login_form_ui, update_appearance_mode, clear_main_content, clear_sidebar, display_Tickets
 from GUI_Authentication import login, update_sidebar_after_login, logout, register
 from GUI_Booking import booking_page, update_available_trains, book_tickets, clear_booking_form, other_features
+from GUI_ShowTicket import ShowTicket
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("blue")
@@ -69,12 +69,18 @@ class App(customtkinter.CTk):
 
     def login(self):
         login(self)
+        update_appearance_mode(self)
+
+    def ShowTicket(self):
+        ShowTicket(self)
+
 
     def update_sidebar_after_login(self, username):
         update_sidebar_after_login(self, username)
 
     def logout(self):
         logout(self)
+        update_appearance_mode(self)
 
     def register(self):
         register(self)

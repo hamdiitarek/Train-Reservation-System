@@ -2,6 +2,7 @@ import sys
 sys.dont_write_bytecode = True
 import customtkinter
 import GUI_Booking
+import GUI_ShowTicket
 
 def create_login_form_ui(app):
     app.clear_sidebar()
@@ -33,6 +34,13 @@ def update_appearance_mode(app):
                                                                     command=app.change_appearance_mode_event)
     app.appearance_mode_optionemenu.grid(row=9, column=0, padx=20, pady=(10, 10))
 
+def display_Tickets(app):
+
+    app.my_tickets_button = customtkinter.CTkButton(app.sidebar_frame, text="Show Booked Tickets", command=app.ShowTicket)
+    app.my_tickets_button.grid(row=5, column=0, padx=20, pady=(10, 10), sticky="ew")
+
+    app.book_ticket_button = customtkinter.CTkButton(app.sidebar_frame, text="Book Ticket", command=app.booking_page)
+    app.book_ticket_button.grid(row=4, column=0, padx=20, pady=(10, 10), sticky="ew")
 
 def clear_sidebar(app):
     for widget in app.sidebar_frame.winfo_children():

@@ -4,7 +4,7 @@ sys.dont_write_bytecode = True
 import mysql.connector
 from collections import deque
 from CreateConnection import create
-from datetime import datetime, timedelta
+
 
 def get_all_stations():
     connection = create()
@@ -172,21 +172,44 @@ def book_ticket(route, username):
     connection.close()
 
 def fetch_tickets(username):
-        # Database connection to fetch tickets
-        conn = create()
-        cursor = conn.cursor()
-
+    
+    conn = create()
+    cursor = conn.cursor()
+    
+    sql = """
+        select distinct(Together_ID)
+        from Ticket
+        where username = \"{}\"
+    """.format(username)
+    
+    cursor.execute(sql)
+    together_IDS = cursor.fetchall()
+    tickets_Together = dict()
+    
+    # together_id -> list()
+    
+    for together_id in together_IDS:
+    
+        together_id = list(together_id)
+        together_id = together_id[0]
+        
         sql = """
-            SELECT Ticket_ID, Together_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, abs((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60) as price
-            FROM Ticket 
-            WHERE username = \"{}\";
-        """.format(username)
-
+            select Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, ((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60) as price
+            from Ticket
+            where username = \"{}\" and Together_ID = {}
+            order by Ticket_ID;
+        """.format(username, together_id)
+        
         cursor.execute(sql)
-        tickets = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return tickets
+        arr = cursor.fetchall()
+        tickets_Together[together_id] = list()
+        
+        for j in arr:
+            tickets_Together[together_id].append(j)
+    
+    cursor.close()
+    conn.close()
+    return tickets_Together
 
 def delete_ticket(together_id, username):
     connecion = create()
@@ -196,5 +219,6 @@ def delete_ticket(together_id, username):
     cursor.close()
     connecion.close()
 
+# print()
+print(fetch_tickets("omar"))
 #print(getCompleteRoute("New Hampshire", "Connecticut"))
-# print(fetch_tickets("omar"))

@@ -21,7 +21,7 @@ def booking_page(app):
     app.from_entry = customtkinter.CTkOptionMenu(app.booking_frame, values=Booking.get_all_stations())
     app.from_entry.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="w")
 
-    app.From_button = customtkinter.CTkButton(app.booking_frame, text="Update To Stations", command=lambda: update_to_stations(app))
+    app.From_button = customtkinter.CTkButton(app.booking_frame, text="Select from", command=lambda: update_to_stations(app))
     app.From_button.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="e")
 
     app.to_label = customtkinter.CTkLabel(app.booking_frame, text="To:")
@@ -30,16 +30,16 @@ def booking_page(app):
     app.to_entry = customtkinter.CTkOptionMenu(app.booking_frame, values=[])
     app.to_entry.grid(row=1, column=1, padx=10, pady=(5, 10), sticky="w")
 
-    app.to_button = customtkinter.CTkButton(app.booking_frame, text="Update List of trains", command=lambda: update_available_trains(app, None))
+    app.to_button = customtkinter.CTkButton(app.booking_frame, text="Select to", command=lambda: update_available_trains(app, None))
     app.to_button.grid(row=1, column=1, padx=10, pady=(5, 10), sticky="e")
     
     app.book_button = customtkinter.CTkButton(app.booking_frame, text="Book", command=lambda: book_tickets(app))
     app.book_button.grid(row=2, column=0, columnspan=3, padx=10, pady=(10, 10), sticky="ew")
 
-    app.available_trains_label = customtkinter.CTkLabel(app.booking_frame, text="Available Trains:")
+    app.available_trains_label = customtkinter.CTkLabel(app.booking_frame, text="Available Trips:")
     app.available_trains_label.grid(row=3, column=0, columnspan=3, padx=10, pady=(10, 5), sticky="w")
 
-    app.available_trains_listbox = tk.Listbox(app.booking_frame)
+    app.available_trains_listbox = tk.Listbox(app.booking_frame, font=("Arial", 16))
     app.available_trains_listbox.grid(row=4, column=0, columnspan=3, padx=10, pady=(5, 10), sticky="nsew")
 
     app.booking_frame.grid_columnconfigure(0, weight=1)

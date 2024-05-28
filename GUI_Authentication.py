@@ -2,11 +2,18 @@ import sys
 sys.dont_write_bytecode = True
 
 import tkinter.messagebox
+from PIL import Image
+import os
 import customtkinter
 import CreateConnection
 import LoginVerifier
-from GUI_ui import clear_main_content, clear_sidebar, create_login_form_ui
-import GUI_Booking
+from GUI_ui import clear_main_content, clear_sidebar, create_login_form_ui, display_Tickets
+
+light_image_path = os.path.join(os.path.dirname(__file__), "1.png")
+dark_image_path = os.path.join(os.path.dirname(__file__), "2.png")
+my_image = customtkinter.CTkImage(light_image=Image.open(light_image_path),
+                                    dark_image=Image.open(dark_image_path),
+                                    size=(930, 580))
 
 def login(app):
     username = app.username_entry.get()
@@ -46,9 +53,15 @@ def update_sidebar_after_login(app, username):
     app.logout_button = customtkinter.CTkButton(app.sidebar_frame, text="Logout", command=app.logout)
     app.logout_button.grid(row=1, column=0, padx=20, pady=(10, 10), sticky="ew")
 
+    display_Tickets(app)
+
+
 def logout(app):
     create_login_form_ui(app)
     clear_main_content(app)
+    app.image_label = customtkinter.CTkLabel(app, image=my_image, text="")
+    app.image_label.grid(row=0, column=1, sticky="nsew")
+
 
 
 def register(app):
