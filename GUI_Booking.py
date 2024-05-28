@@ -88,8 +88,9 @@ def update_available_trains(app, event):
 
     app.available_trains_listbox.delete(0, tk.END)
     for route in routes:
+        priceStr = "price = {} ".format((route[len(route) - 1][3] - route[0][3]) * 2)
         route_str = " -> ".join([f"{fStation} (Train {Train_id} at {Dept_time})" for fStation, tStation, Train_id, Dept_time in route])
-        app.available_trains_listbox.insert(tk.END, route_str)
+        app.available_trains_listbox.insert(tk.END, priceStr + route_str)
 
 def book_tickets(app):
     

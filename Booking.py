@@ -1,11 +1,3 @@
-
-# Please dont touch this file l7ad ma 2s7a we 2khosh el meeting
-# 3andak mola7za ektebha bara
-
-# i modified el sql schema
-
-# el file dah el tneen by3ml kol 7aga (graph, booking, update stations list, test booking)
-
 import sys
 sys.dont_write_bytecode = True
 
@@ -13,7 +5,6 @@ import mysql.connector
 from collections import deque
 from CreateConnection import create
 from datetime import datetime, timedelta
-
 
 def get_all_stations():
     connection = create()
@@ -76,6 +67,39 @@ def find_route(routes, start, end):
         return route
     return None
 
+def getSeats(Train_ID):
+    
+    connection = create()
+    cursor = connection.cursor()
+    
+    sql = """
+        SELECT sum(Seats_array)
+        FROM Coach
+        where Train_ID = {}
+    """.format(Train_ID)
+            
+    cursor.execute(sql)
+    seat = cursor.fetchone()
+    seat = list(seat)
+    seat = seat[0]
+    
+    if (seat >= 100):
+        print("train is full")
+        return
+        
+    coach = (seat // 25) + 1
+    seat = (seat % 25) + 1
+
+    sql = """
+        update coach
+        set Seats_array = {}
+        where Coach_Number = {} and Train_ID = {};
+    """.format(seat, coach, Train_ID)
+
+    cursor.execute(sql)
+    cursor.close()
+    connection.close()
+    return seat, coach
 
 def book_ticket(departure_time, from_station, to_station, username):
     
@@ -87,120 +111,34 @@ def book_ticket(departure_time, from_station, to_station, username):
     booked_together_id = cursor.fetchone()[0]
     booked_together_id = booked_together_id + 1 if booked_together_id else 1
     
-    try:
-        routes = get_routes()
-        route = find_route(routes, from_station, to_station)
+    l = getCompleteRoute(from_station, to_station)
+    ans = []
+    
+    for i in l:
+        if i[0][3] == departure_time:
+            ans = i
+            break
         
-        if not route:
-            raise ValueError("No route found between {} and {}".format(from_station, to_station))
-        
-        print(route)
-        
-        last_departure_time = datetime.strptime("{}:{}".format(departure_time, 0), "%H:%M")
-        print(f"Starting at {from_station} at {last_departure_time.strftime('%H:%M')}")
-        first_train_id = route[1][1]
-        
-        for i in range(len(route) - 1):
-            [station, current_train_id] = route[i]
-            [next_station, next_train_id] = route[i + 1]
-
-            if i > 0 and current_train_id != next_train_id:
-            # Assume 10 minutes to switch trains
-                temp = last_departure_time;
-                last_departure_time += timedelta(minutes=10)
-                print(f"Switch trains at {station}. Next train (ID: {next_train_id}) departs at {last_departure_time.strftime('%H:%M')}")
-                
-                sql = """
-                    SELECT sum(Seats_array)
-                    FROM Coach
-                    where Train_ID = {}
-                """.format(first_train_id)
-                
-                cursor.execute(sql)
-                seat = cursor.fetchone()
-                seat = list(seat)
-                seat = seat[0]
-                
-                if (seat >= 100):
-                    print("train is full")
-                    return
-                    
-                coach = (seat // 25) + 1
-                seat = (seat % 25) + 1
-
-                sql = """
-                    update coach
-                    set Seats_array = {}
-                    where Coach_Number = {} and Train_ID = {};
-                """.format(seat, coach, first_train_id)
-
-                cursor.execute(sql)
-                
-                sql = """
-                INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """
-                
-                arrival_time = last_departure_time.strftime("%H:%M")
-                val = (first_train_id, booked_together_id, departure_time, temp, from_station, station, coach, seat, username)
-                cursor.execute(sql, val)
-                connection.commit()
-                departure_time = arrival_time
-                first_train_id = next_train_id
-                from_station = station
-
-            # Assume 1 hour travel time between stations (adjust as needed)
-            travel_time = timedelta(hours=1)
-            last_departure_time += travel_time
-            print(f"Arrive at {next_station} at {last_departure_time.strftime('%H:%M')}")
-
-        arrival_time = last_departure_time.strftime("%H:%M")
-        
-        # Use the train ID from the first segment of the journey
-
-        sql = """
-            SELECT sum(Seats_array)
-            FROM Coach
-            where Train_ID = {}
-        """.format(first_train_id)
-                
-        cursor.execute(sql)
-        seat = cursor.fetchone()
-        seat = list(seat)
-        seat = seat[0]
-        
-        if (seat >= 100):
-            print("train is full")
-            return
+    tickets = []
+    last = 0
+    
+    for i in range(1, len(ans)):
+        if ans[i][2] != ans[i - 1][2]:
+            tickets.append([last, i - 1])
+            last = i
             
-        coach = (seat // 25) + 1
-        seat = (seat % 25) + 1
+    if tickets[len(tickets) - 1] != [last, len(tickets) - 1]:
+        tickets.append([last, len(tickets) - 1])
 
-        sql = """
-            update coach
-            set Seats_array = {}
-            where Coach_Number = {} and Train_ID = {};
-        """.format(seat, coach, first_train_id)
-
+    for trips in tickets:
+        
+        seat, coach = getSeats(ans[trips[0]][2])
+        sql = """INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username) VALUES ({}, {}, \"{}\", \"{}\", \"{}\", \"{}\", {}, {}, \"{}\")""".format(ans[trips[0]][2], booked_together_id, "{}:0".format(ans[trips[0]][3]), "{}:55".format(ans[trips[1]][3] + 1), ans[trips[0]][0], ans[trips[1]][1], coach, seat, username)
         cursor.execute(sql)
-        
-        sql = """
-        INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        val = (first_train_id, booked_together_id, departure_time, arrival_time, from_station, to_station, coach, seat, username)
-        cursor.execute(sql, val)
         connection.commit()
-        
-        print("Ticket booked successfully")
-    except mysql.connector.Error as err:
-        print("Error: {}".format(err))
-        connection.rollback()
-    finally:
-        cursor.close()
-        connection.close()
 
-
+    # cursor.close()
+    # connection.close()
 
 def update_to_station_list(from_station):
     
@@ -272,10 +210,9 @@ def fetch_tickets(username):
         cursor = conn.cursor()
 
         sql = """
-            SELECT Ticket_ID, Together_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no
+            SELECT Ticket_ID, Together_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, abs((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60) * 2 as price
             FROM Ticket 
-            WHERE username = \"{}\"
-            order by Together_ID;
+            WHERE username = \"{}\";
         """.format(username)
 
         cursor.execute(sql)
@@ -290,6 +227,8 @@ def delete_ticket(together_id, username):
     connecion.commit()
     connecion.close()
 #print(getCompleteRoute("New Hampshire", "Connecticut"))
+
+print(fetch_tickets("omar"))
 
 #booking test
 # try:
