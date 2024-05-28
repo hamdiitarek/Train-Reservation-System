@@ -19,6 +19,7 @@ customtkinter.set_default_color_theme("blue")
 class App(customtkinter.CTk):
     
     UserName = ""
+    Routes = []
     
     def __init__(self):
         super().__init__()
@@ -53,6 +54,12 @@ class App(customtkinter.CTk):
         
     def getUsername(self):
         return self.UserName
+    
+    def setRoutes(self, value):
+        self.Routes = value
+        
+    def getRoutes(self):
+        return self.Routes.copy()
 
     def clear_sidebar(self):
         clear_sidebar(self)

@@ -85,10 +85,11 @@ def update_available_trains(app, event):
         return
 
     routes = Booking.getCompleteRoute(from_location, to_location)
+    app.setRoutes(routes)
 
     app.available_trains_listbox.delete(0, tk.END)
     for route in routes:
-        priceStr = "price = {} ".format((route[len(route) - 1][3] - route[0][3]) * 2)
+        priceStr = "price = {} ".format((route[-1][3] + 2 - route[0][3]))
         route_str = " -> ".join([f"{fStation} (Train {Train_id} at {Dept_time})" for fStation, tStation, Train_id, Dept_time in route])
         app.available_trains_listbox.insert(tk.END, priceStr + route_str)
 
@@ -100,12 +101,11 @@ def book_tickets(app):
         tkinter.messagebox.showwarning("No Selection", "Please select a train to book.")
         return
 
-    from_location = app.from_entry.get()
-    to_location = app.to_entry.get()
-    routes = Booking.getCompleteRoute(from_location, to_location)
+    routes = app.getRoutes()
     choice = list(selected_trains)
     route = routes[choice[0]]
-    Booking.book_ticket(route[0][3], route[0][0], route[-1][0], app.getUsername())
+    # Booking.book_ticket(route[0][3], route[0][0], route[-1][0], app.getUsername())
+    Booking.book_ticket(route, app.getUsername())
  
     selected_trains_list = [app.available_trains_listbox.get(i) for i in selected_trains]
     tkinter.messagebox.showinfo("Booking Successful", f"Tickets booked for: {', '.join(selected_trains_list)}")

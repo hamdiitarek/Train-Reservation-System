@@ -77,7 +77,7 @@ def getSeats(Train_ID):
         FROM Coach
         where Train_ID = {}
     """.format(Train_ID)
-            
+      
     cursor.execute(sql)
     seat = cursor.fetchone()
     seat = list(seat)
@@ -97,11 +97,12 @@ def getSeats(Train_ID):
     """.format(seat, coach, Train_ID)
 
     cursor.execute(sql)
+    connection.commit()
     cursor.close()
     connection.close()
     return seat, coach
 
-def book_ticket(departure_time, from_station, to_station, username):
+def book_ticket(route, username):
     
     connection = create()
     cursor = connection.cursor()
@@ -110,30 +111,32 @@ def book_ticket(departure_time, from_station, to_station, username):
     cursor.execute("SELECT MAX(Together_ID) FROM Ticket")
     booked_together_id = cursor.fetchone()[0]
     booked_together_id = booked_together_id + 1 if booked_together_id else 1
-    
-    l = getCompleteRoute(from_station, to_station)
-    ans = []
-    
-    for i in l:
-        if i[0][3] == departure_time:
-            ans = i
-            break
         
     tickets = []
     last = 0
     
-    for i in range(1, len(ans)):
-        if ans[i][2] != ans[i - 1][2]:
+    for i in range(1, len(route)):
+        if route[i][2] != route[i - 1][2]:
             tickets.append([last, i - 1])
             last = i
             
-    if tickets[len(tickets) - 1] != [last, len(tickets) - 1]:
-        tickets.append([last, len(tickets) - 1])
+    if tickets[-1] != [last, len(route) - 1]:
+        tickets.append([last, len(route) - 1])
 
     for trips in tickets:
         
-        seat, coach = getSeats(ans[trips[0]][2])
-        sql = """INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username) VALUES ({}, {}, \"{}\", \"{}\", \"{}\", \"{}\", {}, {}, \"{}\")""".format(ans[trips[0]][2], booked_together_id, "{}:0".format(ans[trips[0]][3]), "{}:55".format(ans[trips[1]][3] + 1), ans[trips[0]][0], ans[trips[1]][1], coach, seat, username)
+        train_id = route[trips[0]][2]
+        departure_time = "{}:0".format(route[trips[0]][3])
+        arrival_time = "{}:55".format(route[trips[1]][3] + 1)
+        from_station = route[trips[0]][0]
+        to_station = route[trips[1]][1]
+        seat, coach = getSeats(route[trips[0]][2])
+        
+        sql = """
+            INSERT INTO Ticket (Train_ID, Together_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, username)
+            VALUES ({}, {}, \"{}\", \"{}\", \"{}\", \"{}\", {}, {}, \"{}\")
+        """.format(train_id, booked_together_id, departure_time, arrival_time, from_station, to_station, coach, seat, username)
+        
         cursor.execute(sql)
         connection.commit()
 
@@ -210,7 +213,7 @@ def fetch_tickets(username):
         cursor = conn.cursor()
 
         sql = """
-            SELECT Ticket_ID, Together_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, abs((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60) * 2 as price
+            SELECT Ticket_ID, Together_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, abs((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60) as price
             FROM Ticket 
             WHERE username = \"{}\";
         """.format(username)
