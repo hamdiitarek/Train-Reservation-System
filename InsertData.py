@@ -17,11 +17,11 @@ def create_train(Name, Train_ID):
     return True
 
 
-def create_Coach(Train_ID, Coach_Number, Seats_array, Max_Seats):
+def create_Coach(Train_ID, Coach_Number, Seats_taken):
     connection = CreateConnection.create()
     backEnd = connection.cursor()
-    sql = "INSERT IGNORE INTO Train (Train_ID, Coach_Number, Seats_array, Max_Seats) VALUES (%s, %s, %s, %s)"
-    val = (Train_ID, Coach_Number, Seats_array, Max_Seats)
+    sql = "INSERT IGNORE INTO Train (Train_ID, Coach_Number, Seats_taken) VALUES (%s, %s, %s)"
+    val = (Train_ID, Coach_Number, Seats_taken)
     backEnd.execute(sql, val)
     connection.commit()
     backEnd.close()
@@ -129,8 +129,8 @@ def insert_coaches_in_trains():
             train_id = train[0]
             for coach_number in range(1, 5):
                 backEnd.execute(
-                    "INSERT IGNORE INTO coach (Train_ID, Coach_Number, Seats_array, Max_Seats) VALUES (%s, %s, %s, %s)",
-                    (train_id, coach_number, 0, 33554431),
+                    "INSERT IGNORE INTO coach (Train_ID, Coach_Number, Seats_taken) VALUES (%s, %s, %s)",
+                    (train_id, coach_number, 0),
                 )
 
         # Commit the transaction

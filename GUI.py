@@ -20,6 +20,7 @@ class App(customtkinter.CTk):
     
     UserName = ""
     Routes = []
+    Bookings = []
     
     def __init__(self):
         super().__init__()
@@ -49,6 +50,12 @@ class App(customtkinter.CTk):
         create_login_form_ui(self)
         update_appearance_mode(self)
     
+    def setBookings(self, value):
+        self.Bookings = value
+        
+    def getBookings(self):
+        return self.Bookings
+    
     def setUsername(self, value):
         self.UserName = value
         
@@ -73,7 +80,6 @@ class App(customtkinter.CTk):
 
     def ShowTicket(self):
         ShowTicket(self)
-
 
     def update_sidebar_after_login(self, username):
         update_sidebar_after_login(self, username)

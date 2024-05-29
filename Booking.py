@@ -19,7 +19,7 @@ def getSeats(Train_ID):
     cursor = connection.cursor()
     
     sql = """
-        SELECT sum(Seats_array)
+        SELECT sum(Seats_taken)
         FROM Coach
         where Train_ID = {}
     """.format(Train_ID)
@@ -38,7 +38,7 @@ def getSeats(Train_ID):
 
     sql = """
         update coach
-        set Seats_array = {}
+        set Seats_taken = {}
         where Coach_Number = {} and Train_ID = {};
     """.format(seat, coach, Train_ID)
 
@@ -209,14 +209,61 @@ def fetch_tickets(username):
     conn.close()
     return tickets_Together
 
+def removeSeat(Train_ID, Coach_Number, Seat_no):
+    
+    connecion = create()
+    cursor = connecion.cursor()
+    
+    sql = """
+        select Seats_taken
+        from Coach
+        where Train_ID = {} and Coach_Number = \"{}\"
+    """.format(Train_ID, Coach_Number)
+    
+    cursor.execute(sql)
+    seats = cursor.fetchone()
+    seats = seats[0]
+    seats = seats - 1
+    
+    sql = """
+        update coach
+        set Seats_taken = {}
+        where Coach_Number = {} and Train_ID = {};
+    """.format(seats, Coach_Number, Train_ID)
+    
+    cursor.execute(sql)
+    connecion.commit()
+    
+    sql = """
+        update ticket
+        set Seat_no = Seat_no - 1
+        where Train_ID = {} and Coach_Number = \"{}\" and Seat_no < {}
+    """.format(Train_ID, Coach_Number, Seat_no)
+    
+    cursor.execute(sql)
+    connecion.commit()
+
 def delete_ticket(together_id, username):
     connecion = create()
     cursor = connecion.cursor()
+    
+    sql = """
+        select Train_ID, Coach_Number, Seat_no
+        from Ticket
+        where Together_ID = {} and username = \"{}\"
+    """.format(together_id, username)
+    
+    cursor.execute(sql)
+    arr = cursor.fetchall()
+    
+    for i in arr:
+        removeSeat(i[0], i[1], i[2])
+    
     cursor.execute("DELETE FROM Ticket WHERE Together_ID = {} and username = \"{}\"".format(together_id, username))
     connecion.commit()
     cursor.close()
     connecion.close()
 
 # print()
-#print(fetch_tickets("omar"))
+# print(fetch_tickets("omar"))
 #print(getCompleteRoute("New Hampshire", "Connecticut"))

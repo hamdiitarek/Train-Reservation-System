@@ -37,8 +37,7 @@ def Construct_Database():
     (
         Train_ID NUMERIC(10),
         Coach_Number NUMERIC(1),
-        Seats_array NUMERIC(8),
-        Max_Seats NUMERIC(8),
+        Seats_taken NUMERIC(8),
         PRIMARY KEY(Train_ID, Coach_Number),
         FOREIGN KEY(Train_ID) references Train(Train_ID)
     );
