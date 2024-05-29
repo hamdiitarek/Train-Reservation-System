@@ -237,7 +237,7 @@ def removeSeat(Train_ID, Coach_Number, Seat_no):
     sql = """
         update ticket
         set Seat_no = Seat_no - 1
-        where Train_ID = {} and Coach_Number = \"{}\" and Seat_no < {}
+        where Train_ID = {} and Coach_Number = \"{}\" and Seat_no > {}
     """.format(Train_ID, Coach_Number, Seat_no)
     
     cursor.execute(sql)
