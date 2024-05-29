@@ -1,8 +1,6 @@
 import sys
 sys.dont_write_bytecode = True
 
-import mysql.connector
-from collections import deque
 from CreateConnection import create
 
 
@@ -148,7 +146,7 @@ def book_ticket(route, username):
             tickets.append([last, i - 1])
             last = i
             
-    if tickets[-1] != [last, len(route) - 1]:
+    if len(tickets) == 0 or tickets[-1] != [last, len(route) - 1]:
         tickets.append([last, len(route) - 1])
 
     for trips in tickets:
@@ -194,7 +192,7 @@ def fetch_tickets(username):
         together_id = together_id[0]
         
         sql = """
-            select Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, ((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60) as price
+            select Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, ((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60)/2 * 25 as price
             from Ticket
             where username = \"{}\" and Together_ID = {}
             order by Ticket_ID;

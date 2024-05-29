@@ -19,32 +19,33 @@ def booking_page(app):
     app.from_label.grid(row=0, column=0, padx=10, pady=(10, 5), sticky="w")
 
     app.from_entry = customtkinter.CTkOptionMenu(app.booking_frame, values=Booking.get_all_stations())
-    app.from_entry.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="w")
+    app.from_entry.grid(row=1, column=0, padx=5, pady=(5, 10), sticky="w")
 
     app.From_button = customtkinter.CTkButton(app.booking_frame, text="Select from", command=lambda: update_to_stations(app))
-    app.From_button.grid(row=1, column=0, padx=10, pady=(5, 10), sticky="e")
+    app.From_button.grid(row=1, column=1, padx=0, pady=(5, 10), sticky="w")
 
     app.to_label = customtkinter.CTkLabel(app.booking_frame, text="To:")
-    app.to_label.grid(row=0, column=1, padx=10, pady=(10, 5), sticky="w")
+    app.to_label.grid(row=0, column=2, padx=10, pady=(10, 5), sticky="w")
 
     app.to_entry = customtkinter.CTkOptionMenu(app.booking_frame, values=[])
-    app.to_entry.grid(row=1, column=1, padx=10, pady=(5, 10), sticky="w")
+    app.to_entry.grid(row=1, column=2, padx=5, pady=(5, 10), sticky="w")
 
     app.to_button = customtkinter.CTkButton(app.booking_frame, text="Select to", command=lambda: update_available_trains(app, None))
-    app.to_button.grid(row=1, column=1, padx=10, pady=(5, 10), sticky="e")
+    app.to_button.grid(row=1, column=3, padx=0, pady=(5, 10), sticky="w")
     
     app.book_button = customtkinter.CTkButton(app.booking_frame, text="Book", command=lambda: book_tickets(app))
-    app.book_button.grid(row=2, column=0, columnspan=3, padx=10, pady=(10, 10), sticky="ew")
+    app.book_button.grid(row=2, column=0, columnspan=4, padx=10, pady=(10, 10), sticky="ew")
 
     app.available_trains_label = customtkinter.CTkLabel(app.booking_frame, text="Available Trips:")
-    app.available_trains_label.grid(row=3, column=0, columnspan=3, padx=10, pady=(10, 5), sticky="w")
+    app.available_trains_label.grid(row=3, column=0, columnspan=4, padx=10, pady=(10, 5), sticky="w")
 
     app.available_trains_listbox = tk.Listbox(app.booking_frame, font=("Arial", 16))
-    app.available_trains_listbox.grid(row=4, column=0, columnspan=3, padx=10, pady=(5, 10), sticky="nsew")
+    app.available_trains_listbox.grid(row=4, column=0, columnspan=4, padx=10, pady=(5, 10), sticky="nsew")
 
     app.booking_frame.grid_columnconfigure(0, weight=1)
-    app.booking_frame.grid_columnconfigure(1, weight=1)
+    app.booking_frame.grid_columnconfigure(1, weight=6)
     app.booking_frame.grid_columnconfigure(2, weight=1)
+    app.booking_frame.grid_columnconfigure(3, weight=6)
     app.booking_frame.grid_rowconfigure(4, weight=1)
 
 def printTickets(app):
@@ -65,8 +66,6 @@ def modify_ticket(app):
     app.booking_frame.grid_columnconfigure(1, weight=1)
     app.booking_frame.grid_columnconfigure(2, weight=1)
     app.booking_frame.grid_rowconfigure(4, weight=1)
-
-    
 
 
 def update_to_stations(app):
@@ -89,7 +88,7 @@ def update_available_trains(app, event):
 
     app.available_trains_listbox.delete(0, tk.END)
     for route in routes:
-        priceStr = "price = {}\n | Start station = {}\n | Destination = {}\n | From {}:00 to {}:55".format((route[-1][3] + 2 - route[0][3]), from_location, to_location, route[0][3], route[-1][3] + 1)
+        priceStr = "price = {}\n | Start station = {}\n | Destination = {}\n | From {}:00 to {}:55".format((route[-1][3] + 2 - route[0][3]) / 2 * 25, from_location, to_location, route[0][3], route[-1][3] + 1)
         app.available_trains_listbox.insert(tk.END, priceStr)
 
 def book_tickets(app):
