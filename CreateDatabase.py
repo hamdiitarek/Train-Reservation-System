@@ -90,6 +90,13 @@ def Construct_Database():
         SELECT username,Together_ID, Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, ((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60)/2 * 25 as price
         FROM Ticket;
     """
+    
+    Revenue_View = """
+        SELECT TR.Train_ID as Train_ID , TR.Name as Train_Name, SUM(((time_to_sec(TC.Arrival_Time) - time_to_sec(TC.Departure_Time) + 5*60)/60/60)/2 * 25) as Total_Train_Revenue
+        FROM TICKET as TC, TRAIN as TR
+        WHERE TC.Train_ID = TR.Train_ID
+        group by TR.Train_ID;
+    """
 
     connection = CreateConnection.create()
     backEnd = connection.cursor()
@@ -102,6 +109,7 @@ def Construct_Database():
     check_and_create_table(backEnd, 'Time_Track', create_Time_Track_table_sql)
 
     create_view(backEnd, 'SHOW_TICKETS', Tickets_View)
+    create_view(backEnd, 'REVENUE', Revenue_View)
     
     backEnd.close()
     connection.close()
