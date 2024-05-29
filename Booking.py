@@ -192,10 +192,10 @@ def fetch_tickets(username):
         together_id = together_id[0]
         
         sql = """
-            select Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, ((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60)/2 * 25 as price
-            from Ticket
-            where username = \"{}\" and Together_ID = {}
-            order by Ticket_ID;
+            SELECT Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, ((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60)/2 * 25 as price
+            FROM SHOW_TICKETS
+            WHERE username = \"{}\" AND Together_ID = {}
+            ORDER BY Ticket_ID;
         """.format(username, together_id)
         
         cursor.execute(sql)

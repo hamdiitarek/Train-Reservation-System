@@ -1,11 +1,21 @@
 import sys
 sys.dont_write_bytecode = True
 
+from mysql.connector import Error
+
 import CreateConnection
 
 def check_and_create_table(backEnd, table_name, create_table_sql):
     backEnd.execute("CREATE TABLE IF NOT EXISTS {}".format(table_name + create_table_sql))
-    
+
+def create_view(backEnd, view_name, view_sql):
+    try:
+        backEnd.execute(f"DROP VIEW IF EXISTS {view_name}")
+        backEnd.execute("CREATE VIEW {0} as {1}".format(view_name, view_sql))
+        print("View created successfully")
+    except Error as e:
+        print(f"Error: '{e}'")
+
 def Construct_Database():
     
     create_users_table_sql = """
@@ -76,6 +86,11 @@ def Construct_Database():
     );          
     """
 
+    Tickets_View = """
+        SELECT username,Together_ID, Ticket_ID, Train_ID, Departure_Time, Arrival_Time, From_Station, To_Station, Coach_Number, Seat_no, ((time_to_sec(Arrival_Time) - time_to_sec(Departure_Time) + 5*60)/60/60)/2 * 25 as price
+        FROM Ticket;
+    """
+
     connection = CreateConnection.create()
     backEnd = connection.cursor()
     
@@ -85,6 +100,8 @@ def Construct_Database():
     check_and_create_table(backEnd, 'Coach', create_Coach_table_sql)
     check_and_create_table(backEnd, 'Ticket', create_Ticket_table_sql)
     check_and_create_table(backEnd, 'Time_Track', create_Time_Track_table_sql)
+
+    create_view(backEnd, 'SHOW_TICKETS', Tickets_View)
     
     backEnd.close()
     connection.close()
