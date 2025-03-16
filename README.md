@@ -85,7 +85,7 @@ All tables satisfy **3NF** (no transitive dependencies).
 ## ⚙️ Setup Guide  
 1. **Clone Repository**  
    ```bash
-   git clone https://github.com/yourusername/railway-booking-system.git
+   git clone https://github.com/hamdiitarek/railway-booking-system.git
    cd railway-booking-system
    ```  
 2. **Database Setup**  
@@ -124,7 +124,8 @@ All tables satisfy **3NF** (no transitive dependencies).
 ### 3. View Tickets  
 - Tickets grouped by `Together_ID` for multi-route trips.  
 - Displays seat, price, and transit details.  
-
+![Tickets Interface1](ticket_demo1.png)
+![Tickets Interface2](ticket_demo2.png)
 ---
 
 ## 🧠 Algorithm Deep Dive  
